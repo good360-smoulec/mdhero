@@ -29,6 +29,7 @@
     canPresent = false,
     presenting = false,
     onTogglePresent = () => {},
+    onPrint = () => window.print(),
   }: {
     onPaste?: () => void;
     onOpen?: () => void;
@@ -45,6 +46,9 @@
     canPresent?: boolean;
     presenting?: boolean;
     onTogglePresent?: () => void;
+    /** Shared with the menu and Ctrl/Cmd+P, so a templated document is laid
+     *  out as pages before the dialog opens. */
+    onPrint?: () => void;
   } = $props();
 
   let currentHeading = $derived(
@@ -106,11 +110,14 @@
   }
 
   // `@tauri-apps/api` exposes no print() on Webview or Window (checked through
-  // 2.11), so the former try-branch calling `getCurrentWebview().print()` was
-  // undefined at runtime and always fell through to this. Same behaviour, no
-  // dead code, no type error.
+  // 2.11), so printing is always window.print(), reached through onPrint.
   function handleExportPdf() {
-    window.print();
+    onPrint();
+  }
+
+  function togglePagedView() {
+    closeAll();
+    settings.update((s) => ({ ...s, pagedView: !s.pagedView }));
   }
 
   async function handleCopyRichText() {
@@ -380,6 +387,24 @@
         </div>
       {/if}
     </div>
+
+    <button
+      onclick={togglePagedView}
+      class="btn btn-icon"
+      class:active={!!activeTemplate && $settings.pagedView}
+      disabled={!activeTemplate || isEditing}
+      title={!activeTemplate
+        ? $t('toolbar.pageViewTitleNoTemplate')
+        : $settings.pagedView
+        ? $t('toolbar.pageViewTitleActive')
+        : $t('toolbar.pageViewTitle')}
+      aria-pressed={!!activeTemplate && $settings.pagedView}
+    >
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="1.5" width="8" height="10" rx="0.5"/>
+        <path d="M6 14.5h7.5a0.5 0.5 0 0 0 .5-.5V5"/>
+      </svg>
+    </button>
 
     <button
       onclick={handleExportPdf}

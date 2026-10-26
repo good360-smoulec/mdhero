@@ -47,8 +47,10 @@ export function parseUserTemplate(files: UserTemplateFiles): DocTemplate {
  * - `url()` other than `data:` becomes `none`, and `@import` is dropped. The CSP
  *   allows https images for documents, so a remote background would otherwise
  *   be a way for a stylesheet to report on what it styles;
- * - `@page` is dropped: the template's margin and the page size setting own it,
- *   and the on-screen sheet has to agree with what prints.
+ * - `@page` keeps only its margin boxes (`@top-center { content: … }`), which is
+ *   how a template adds running headers and footers; size, margins and bleed
+ *   are dropped, because the template's margin and the page size setting own
+ *   them and the on-screen sheet has to agree with what prints.
  *
  * The output is rebuilt from this scanner's reading of the input, so the scanner
  * must split rules exactly where the browser will. Rather than chase every
@@ -204,14 +206,59 @@ function scopeBlock(css: string): string {
     i = close + 1;
     if (!prelude) continue;
     if (prelude.startsWith("@")) {
-      const name = prelude.slice(1).split(/[\s({]/)[0].toLowerCase();
+      const name = prelude.slice(1).split(/[\s({:]/)[0].toLowerCase();
       if (NESTED_AT_RULES.has(name)) out += `${prelude} {\n${scopeBlock(body)}}\n`;
       else if (KEPT_AT_RULES.has(name)) out += `${prelude} {${cleanValues(body)}}\n`;
+      else if (name === "page") out += pageRule(prelude, body);
     } else {
       out += `${scopeSelectors(prelude)} {${cleanValues(body)}}\n`;
     }
   }
   return out;
+}
+
+const PAGE_PRELUDE = /^@page(?:\s*:(?:first|left|right|blank))?$/i;
+const MARGIN_BOXES = new Set([
+  "top-left-corner", "top-left", "top-center", "top-right", "top-right-corner",
+  "bottom-left-corner", "bottom-left", "bottom-center", "bottom-right", "bottom-right-corner",
+  "left-top", "left-middle", "left-bottom", "right-top", "right-middle", "right-bottom",
+]);
+
+/**
+ * An `@page` rule reduced to its margin boxes. Declarations on the page itself
+ * (size, margin, bleed, marks…) are all dropped, as is any block other than a
+ * margin box and any margin box with a block of its own inside.
+ */
+function pageRule(prelude: string, body: string): string {
+  if (!PAGE_PRELUDE.test(prelude.replace(/\s+/g, " "))) return "";
+  let boxes = "";
+  let i = 0;
+  while (i < body.length) {
+    const at = nextBoundary(body, i);
+    if (at === -1) break;
+    if (body[at] === ";") {
+      i = at + 1;
+      continue;
+    }
+    const close = matchingBrace(body, at);
+    const box = /^@([a-z-]+)$/i.exec(body.slice(i, at).trim())?.[1].toLowerCase();
+    const inner = body.slice(at + 1, close);
+    i = close + 1;
+    if (!box || !MARGIN_BOXES.has(box) || hasBlock(inner)) continue;
+    boxes += `@${box} {${cleanValues(inner)}}\n`;
+  }
+  return boxes ? `${prelude} {\n${boxes}}\n` : "";
+}
+
+function hasBlock(css: string): boolean {
+  let found = false;
+  scan(css, 0, (c) => {
+    if (c === "{") {
+      found = true;
+      return true;
+    }
+  });
+  return found;
 }
 
 /** Split on top-level commas, leaving `:is(a, b)` and `[title="a,b"]` whole. */

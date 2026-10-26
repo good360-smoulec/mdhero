@@ -1,0 +1,33 @@
+/* Added after a template's stylesheet when Paged.js lays it out as pages.
+   Paged.js draws each sheet and owns the page margins, so the single-sheet box
+   from base.css comes off the content wrapper, which Paged.js copies onto
+   every page it continues on. */
+.doc-page.doc-flow {
+  width: auto !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  zoom: 1 !important;
+}
+
+/* A letterhead or closing a template draws with ::before / ::after belongs to
+   the first / last page, not to every page the wrapper is continued on.
+   Running headers and footers go in @page margin boxes instead. */
+.doc-page.doc-flow[data-split-from]::before {
+  content: none !important;
+}
+
+.doc-page.doc-flow[data-split-to]::after {
+  content: none !important;
+}
+
+/* When a page breaks between blocks, Paged.js marks the wrapper as the split
+   element and, under a justified template, justifies its last line, which
+   every heading and list item would inherit. A paragraph actually split across
+   pages carries its own mark and keeps it. */
+.doc-page.doc-flow[data-align-last-split-element] {
+  text-align-last: auto !important;
+}

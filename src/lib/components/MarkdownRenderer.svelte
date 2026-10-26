@@ -3,7 +3,8 @@
   import { get } from "svelte/store";
   import { invoke } from "@tauri-apps/api/core";
   import { settings, fontFamilyMap, getContentMaxWidth, DEFAULT_FONT_SIZE } from "$lib/stores/settings";
-  import { templateStylesheet, type DocTemplate, type PageSize } from "$lib/templates";
+  import { templateStylesheet, pagedStylesheet, type DocTemplate, type PageSize } from "$lib/templates";
+  import type { Previewer } from "pagedjs";
   import { tocEntries, activeHeadingId, extractToc, isObserverPaused } from "$lib/stores/toc";
   import { aiLookup, setPendingSelection } from "$lib/stores/aiLookup";
   import { t, translate } from "$lib/i18n";
@@ -17,11 +18,17 @@
     onLocalLink,
     template = null,
     pageSize = "letter",
+    paged = false,
+    onPagesChange = (_ready: boolean) => {},
   }: {
     html: string;
     /** Lay the document out as a page in this template instead of the reader view. */
     template?: DocTemplate | null;
     pageSize?: PageSize;
+    /** With a template, show separate pages (Paged.js) instead of one long sheet. */
+    paged?: boolean;
+    /** False while pages are being laid out, true once they're on screen. */
+    onPagesChange?: (ready: boolean) => void;
     onImageClick?: (src: string, allImages: string[], index: number) => void;
     /**
      * Called when a link to a local file (relative or absolute path, no URL
@@ -40,7 +47,15 @@
   }
 
   let articleEl: HTMLElement | undefined = $state();
+  let pagesEl: HTMLElement | undefined = $state();
   let observer: IntersectionObserver | undefined;
+  let paginating = $state(false);
+  // Set when Paged.js throws; the single sheet is shown instead until the
+  // document or template changes.
+  let pagedFailed = $state(false);
+  let showPages = $derived(!!template && paged && !pagedFailed);
+  let pagedRun = 0;
+  let previewer: Previewer | null = null;
   let lastMermaidTheme = "";
   let tooltipEl: HTMLDivElement | undefined;
 
@@ -121,11 +136,11 @@
     }
   }
 
-  function setupTocObserver() {
-    if (!articleEl) return;
+  function setupTocObserver(root: HTMLElement | undefined = articleEl) {
+    if (!root) return;
     if (observer) observer.disconnect();
 
-    const headings = articleEl.querySelectorAll("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]");
+    const headings = root.querySelectorAll("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]");
     if (headings.length === 0) return;
 
     observer = new IntersectionObserver(
@@ -181,6 +196,7 @@
   onMount(() => {
     return () => {
       observer?.disconnect();
+      discardPages();
       // Remove the body-level tooltip so it can't outlive the component.
       tooltipEl?.remove();
       tooltipEl = undefined;
@@ -189,8 +205,10 @@
 
   // A single style element in the head, not a stylesheet per template, so a
   // template added later at runtime goes in the same way as the built-in ones.
+  // Not while pages are shown: Paged.js inserts its own processed copy, and a
+  // second one would restart CSS counters (section numbers) on every page.
   $effect(() => {
-    if (!template) return;
+    if (!template || showPages) return;
     const style = document.createElement("style");
     style.dataset.mdheroTemplate = template.id;
     style.textContent = templateStylesheet(template, pageSize);
@@ -198,17 +216,32 @@
     return () => style.remove();
   });
 
+  // A new document or template gets another try at pages after a failure.
+  $effect(() => {
+    html;
+    template?.id;
+    pagedFailed = false;
+  });
+
   $effect(() => {
     // Re-run when html changes, or when a template change re-inserts it
     html;
     template?.id;
+    pageSize;
+    const pages = showPages;
 
     // A re-render (e.g. opening a linked file in a new tab) replaces the
     // article, so a hover's mouseleave may never fire — clear any stuck tooltip.
     hideTooltip();
 
+    if (!pages) discardPages();
+
     tick().then(() => {
       if (!articleEl) return;
+      if (pages) {
+        paginate();
+        return;
+      }
 
       // Extract TOC entries
       const entries = extractToc(articleEl);
@@ -234,15 +267,117 @@
     });
   });
 
+  /**
+   * Paged.js 0.4.3 writes each page's `string-set` values (a running header's
+   * chapter title) as `"text` with no closing quote (string-sets.js), which
+   * Chromium rejects, so every `string()` in a margin box came out empty.
+   */
+  function closeStringSets(root: HTMLElement) {
+    root.querySelectorAll<HTMLElement>(".pagedjs_page").forEach((page) => {
+      for (const name of Array.from(page.style)) {
+        if (!name.startsWith("--pagedjs-string-")) continue;
+        const value = page.style.getPropertyValue(name).trim();
+        if (value.startsWith('"') && !/(^|[^\\])"$/.test(value.slice(1))) {
+          page.style.setProperty(name, `${value}"`);
+        }
+      }
+    });
+  }
+
+  /** Drop any pages and Paged.js's stylesheets, and cancel a layout in progress. */
+  function discardPages() {
+    pagedRun++;
+    paginating = false;
+    previewer?.chunker.destroy();
+    previewer?.polisher.destroy();
+    previewer = null;
+  }
+
+  /**
+   * Lay the (hidden) template article out as pages. Diagrams are rendered
+   * first so they are measured at their real size. Paged.js works on a copy,
+   * off-screen and unzoomed, because it measures what it renders and the
+   * visible pages carry the reader's zoom; the finished pages are then moved
+   * in, which also keeps the old ones on screen until the new ones are ready.
+   */
+  async function paginate() {
+    const run = ++pagedRun;
+    paginating = true;
+    onPagesChange(false);
+    // A burst of reloads (an editor saving as you type) lays out once.
+    if (previewer) await new Promise((r) => setTimeout(r, 250));
+    if (run !== pagedRun) return;
+    await renderMermaidBlocks();
+    const tpl = template;
+    if (run !== pagedRun || !articleEl || !tpl) return;
+
+    const flow = document.createElement("div");
+    flow.className = "doc-page doc-flow";
+    flow.dataset.template = tpl.id;
+    flow.dataset.pageSize = pageSize;
+    flow.innerHTML = articleEl.innerHTML;
+    // Listeners don't survive the copy, so the markers saying they're bound
+    // must not either; copy buttons don't belong on paper.
+    flow.querySelectorAll(".code-copy-btn").forEach((btn) => btn.remove());
+    flow.querySelectorAll<HTMLElement>("[data-link-bound], [data-tooltip-bound], [data-lightbox-bound]").forEach((el) => {
+      delete el.dataset.linkBound;
+      delete el.dataset.tooltipBound;
+      delete el.dataset.lightboxBound;
+    });
+    const content = document.createDocumentFragment();
+    content.appendChild(flow);
+
+    const stage = document.createElement("div");
+    stage.className = "paged-stage";
+    document.body.appendChild(stage);
+    let next: Previewer | null = null;
+    try {
+      const { Previewer } = await import("pagedjs");
+      next = new Previewer();
+      await next.preview(content, [{ "template.css": pagedStylesheet(tpl, pageSize) }], stage);
+    } catch (err) {
+      console.error("Paged view failed, showing the single sheet:", err);
+      next?.polisher.destroy();
+      stage.remove();
+      if (run === pagedRun) {
+        discardPages();
+        pagedFailed = true;
+        onPagesChange(true);
+      }
+      return;
+    }
+    if (run !== pagedRun || !pagesEl) {
+      next.chunker.destroy();
+      next.polisher.destroy();
+      stage.remove();
+      return;
+    }
+
+    closeStringSets(stage);
+    previewer?.chunker.destroy();
+    previewer?.polisher.destroy();
+    previewer = next;
+    pagesEl.replaceChildren(...stage.childNodes);
+    stage.remove();
+    paginating = false;
+
+    tocEntries.set(extractToc(pagesEl));
+    setupTocObserver(pagesEl);
+    addImageClickHandlers(pagesEl);
+    addLinkTooltips(pagesEl);
+    addLinkHandlers(pagesEl);
+    onPagesChange(true);
+  }
+
   // The copy buttons are plain DOM, so relabel them when the language changes.
   $effect(() => {
     const label = $t("markdown.copy");
     articleEl?.querySelectorAll(".code-copy-btn").forEach((btn) => (btn.textContent = label));
   });
 
-  function addImageClickHandlers() {
-    if (!articleEl) return;
-    const imgs = articleEl.querySelectorAll("img");
+  function addImageClickHandlers(root: HTMLElement | undefined = articleEl) {
+    if (!root) return;
+    const imgs = root.querySelectorAll("img");
     const allSrcs = Array.from(imgs).map((img) => img.src).filter(Boolean);
 
     imgs.forEach((img, idx) => {
@@ -255,8 +390,8 @@
     });
   }
 
-  function addLinkTooltips() {
-    if (!articleEl) return;
+  function addLinkTooltips(root: HTMLElement | undefined = articleEl) {
+    if (!root) return;
 
     // Create tooltip element once
     // Sweep any orphaned tooltips left by dev HMR reloads so they can't pile up.
@@ -269,7 +404,7 @@
       document.body.appendChild(tooltipEl);
     }
 
-    const links = articleEl.querySelectorAll("a[href]");
+    const links = root.querySelectorAll("a[href]");
     links.forEach((link) => {
       if ((link as HTMLElement).dataset.tooltipBound) return;
       (link as HTMLElement).dataset.tooltipBound = "true";
@@ -288,9 +423,9 @@
     });
   }
 
-  function addLinkHandlers() {
-    if (!articleEl) return;
-    const links = articleEl.querySelectorAll("a[href]");
+  function addLinkHandlers(root: HTMLElement | undefined = articleEl) {
+    if (!root) return;
+    const links = root.querySelectorAll("a[href]");
     links.forEach((link) => {
       if ((link as HTMLElement).dataset.linkBound) return;
       const href = link.getAttribute("href") ?? "";
@@ -346,13 +481,32 @@
 </script>
 
 {#if template}
+  {#if showPages}
+    <!-- The pages Paged.js laid out. It is the article other code looks up
+         (search, scroll restore, Copy as Rich Text) and comes first, so a
+         heading id finds the page copy, not the hidden source below. -->
+    <article
+      bind:this={pagesEl}
+      oncontextmenu={handleContextMenu}
+      class="md-content paged-view"
+      data-template={template.id}
+      data-page-size={pageSize}
+      style="zoom: {$settings.fontSize / DEFAULT_FONT_SIZE};"
+    ></article>
+    {#if paginating}
+      <div class="paginating print:hidden" role="status">{$t("markdown.paginating")}</div>
+    {/if}
+  {/if}
   <!-- The template owns type and width; the reader's text size still applies,
-       as a zoom of the whole page, so Cmd/Ctrl +/- keep working. -->
+       as a zoom of the whole page, so Cmd/Ctrl +/- keep working. In page view
+       this is the hidden source the pages are laid out from. -->
   <article
     bind:this={articleEl}
     oncontextmenu={handleContextMenu}
-    class="md-content doc-page"
+    class="doc-page"
+    class:md-content={!showPages}
     class:wrap-code={$settings.wrapCodeBlocks}
+    hidden={showPages}
     data-template={template.id}
     data-page-size={pageSize}
     style="zoom: {$settings.fontSize / DEFAULT_FONT_SIZE};"
@@ -688,6 +842,80 @@
   :global(html.dark) article:not([data-template]) :global(.code-copy-btn:hover) {
     background: rgba(58,58,60,0.95);
     color: #e5e5e7;
+  }
+
+  /* Page view (Paged.js). The paper stays white in dark mode, like the single
+     sheet, and so does what's printed in its margins. */
+  .paged-view {
+    padding: 2rem 0;
+  }
+
+  /* `safe`: a page wider than the window overflows to the right, where it can
+     be scrolled to, rather than off the left edge. */
+  .paged-view :global(.pagedjs_pages) {
+    display: flex;
+    flex-direction: column;
+    align-items: safe center;
+    gap: 1.5rem;
+  }
+
+  .paged-view :global(.pagedjs_page),
+  :global(.paged-stage .pagedjs_page) {
+    background: #fff;
+    color: #111;
+  }
+
+  .paged-view :global(.pagedjs_page) {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .paginating {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 3rem;
+    z-index: 20;
+    padding: 0.35rem 0.8rem;
+    font-size: 12px;
+    color: #636366;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #e5e5ea;
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  :global(html.dark) .paginating {
+    color: #aeaeb2;
+    background: rgba(44, 44, 46, 0.92);
+    border-color: #3a3a3c;
+  }
+
+  /* Where Paged.js lays pages out: rendered, so it can measure, but off screen. */
+  :global(.paged-stage) {
+    position: fixed;
+    top: 0;
+    left: -100000px;
+    pointer-events: none;
+  }
+
+  @media print {
+    .paged-view {
+      padding: 0;
+      zoom: 1 !important;
+    }
+
+    .paged-view :global(.pagedjs_pages) {
+      display: block;
+    }
+
+    /* One sheet of paper per page at its exact size, rather than Paged.js's
+       height: 100%, which depends on every ancestor's height. */
+    .paged-view :global(.pagedjs_page) {
+      width: var(--pagedjs-pagebox-width) !important;
+      height: var(--pagedjs-pagebox-height) !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      box-shadow: none;
+    }
   }
 
   /* Link tooltip */

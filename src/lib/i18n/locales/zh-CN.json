@@ -59,6 +59,9 @@
     "pdfTitle": "导出 PDF",
     "templateTitle": "文档模板",
     "templateTitleNoFile": "文档模板（请先打开文件）",
+    "pageViewTitle": "按页显示",
+    "pageViewTitleActive": "显示为一整张长页",
+    "pageViewTitleNoTemplate": "分页视图（请先选择模板）",
     "templateFollowDocument": "跟随文档",
     "settings": "设置 ({mod}+,)",
     "settingsAria": "设置",
@@ -319,7 +322,8 @@
   },
   "markdown": {
     "copy": "复制",
-    "copied": "已复制！"
+    "copied": "已复制！",
+    "paginating": "正在分页…"
   },
   "contextMenu": {
     "searchGoogle": "用 Google 搜索选中内容",

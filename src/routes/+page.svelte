@@ -566,13 +566,43 @@
   // accelerator and the keydown for one press — WebView2 also binds Ctrl+P
   // itself, and two print dialogs is worse than none.
   let printInFlight = false;
-  function printDocument() {
+  // A templated document always prints as laid-out pages, so its PDF has the
+  // template's page numbers and running headers and matches the page view. With
+  // page view off, the pages are made just for the print and dropped after.
+  let printPaging = $state(false);
+  let pagesReady = false;
+  let pagesWaiter: (() => void) | null = null;
+  function handlePagesChange(ready: boolean) {
+    pagesReady = ready;
+    if (ready) {
+      pagesWaiter?.();
+      pagesWaiter = null;
+    }
+  }
+  function untilPagesReady(): Promise<void> {
+    if (pagesReady) return Promise.resolve();
+    return new Promise((resolve) => {
+      pagesWaiter = resolve;
+      // Never leave the print waiting on a layout that doesn't come back.
+      setTimeout(resolve, 30000);
+    });
+  }
+  async function printDocument() {
     if (printInFlight) return;
     if (!$docStore.renderedHtml || activeTab?.isEditing) return;
     printInFlight = true;
     try {
+      // Only the rendered view lays out pages; raw source and slides print as they are.
+      if (activeTemplate && !rawMode && !(presenting && activeIsMarp)) {
+        if (!$settings.pagedView) {
+          pagesReady = false;
+          printPaging = true;
+        }
+        await untilPagesReady();
+      }
       window.print();
     } finally {
+      printPaging = false;
       // window.print() is modal on every platform we ship, so by the time it
       // returns the dialog has been dismissed; a short hold covers the
       // menu+keydown pair arriving back to back.
@@ -1226,6 +1256,7 @@
       canPresent={activeIsMarp}
       presenting={presenting}
       onTogglePresent={togglePresent}
+      onPrint={printDocument}
     />
     <TabBar onCloseTab={handleCloseTab} />
   {/if}
@@ -1347,6 +1378,8 @@
           onLocalLink={handleLocalLink}
           template={activeTemplate}
           pageSize={activePageSize}
+          paged={$settings.pagedView || printPaging}
+          onPagesChange={handlePagesChange}
         />
       </main>
     {/if}

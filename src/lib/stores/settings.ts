@@ -30,6 +30,8 @@ export interface ReaderSettings {
   defaultTemplate: string;
   /** Paper size for templates and print, unless a document sets `papersize`. */
   pageSize: PageSize;
+  /** Show a templated document as separate pages instead of one long sheet. */
+  pagedView: boolean;
 }
 
 const STORAGE_KEY = "mdhero-settings";
@@ -103,6 +105,7 @@ function loadSettings(): ReaderSettings {
     tabsWidth: DEFAULT_TABS_WIDTH,
     defaultTemplate: "none",
     pageSize: "letter",
+    pagedView: false,
   };
 
   if (typeof localStorage === "undefined") return defaults;
@@ -128,6 +131,7 @@ function loadSettings(): ReaderSettings {
         tabsWidth: clampTabsWidth(parsed.tabsWidth),
         defaultTemplate: typeof parsed.defaultTemplate === "string" ? parsed.defaultTemplate : defaults.defaultTemplate,
         pageSize: parsed.pageSize === "a4" ? "a4" : "letter",
+        pagedView: storedBoolean(parsed.pagedView, defaults.pagedView),
       };
     }
   } catch {}

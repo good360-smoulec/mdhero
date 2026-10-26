@@ -105,3 +105,13 @@
   border-top: 1px solid #111;
   margin: 1.5em 0;
 }
+
+/* "Page 2 of 3" at the foot, so a printed memo's pages can't be mislaid. */
+@page {
+  @bottom-right {
+    content: "Page " counter(page) " of " counter(pages);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 8.5pt;
+    color: #555;
+  }
+}
