@@ -99,6 +99,77 @@
   list-style: none;
 }
 
+/* Callouts and footnotes, plainly, so a template that never mentions them
+   still prints them sensibly. */
+.doc-page :where(.markdown-alert) {
+  --alert-color: #0969da;
+  margin: 1em 0;
+  padding: 0.4em 0.9em;
+  border-left: 3px solid var(--alert-color);
+}
+
+.doc-page :where(.markdown-alert-tip) { --alert-color: #1a7f37; }
+.doc-page :where(.markdown-alert-important) { --alert-color: #8250df; }
+.doc-page :where(.markdown-alert-warning) { --alert-color: #9a6700; }
+.doc-page :where(.markdown-alert-caution) { --alert-color: #cf222e; }
+
+/* Not :where(): a template's `p { margin }` would otherwise leave a gap at the
+   bottom of every callout. */
+.doc-page .markdown-alert > :first-child {
+  margin-top: 0;
+}
+
+.doc-page .markdown-alert > :last-child {
+  margin-bottom: 0;
+}
+
+.doc-page :where(.markdown-alert-title) {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-weight: bold;
+  color: var(--alert-color);
+}
+
+.doc-page .markdown-alert > .markdown-alert-title {
+  margin-bottom: 0.25em;
+}
+
+.doc-page .markdown-alert-title + * {
+  margin-top: 0;
+}
+
+.doc-page .markdown-alert-icon {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.doc-page :where(sup) {
+  line-height: 0;
+}
+
+/* Beats a template's `a { text-decoration: underline }`; an underlined
+   superscript digit reads as noise. */
+.doc-page .footnote-ref a,
+.doc-page a.footnote-backref {
+  text-decoration: none;
+}
+
+.doc-page :where(.footnotes) {
+  font-size: 0.85em;
+}
+
+.doc-page :where(hr.footnotes-sep) {
+  width: 33%;
+  margin: 2em 0 0.5em;
+}
+
 @media print {
   /* @page owns the margins and size on paper; zoom is a screen convenience. */
   .doc-page {
@@ -120,7 +191,8 @@
   .doc-page pre,
   .doc-page table,
   .doc-page img,
-  .doc-page .mermaid-diagram {
+  .doc-page .mermaid-diagram,
+  .doc-page .markdown-alert {
     break-inside: avoid;
   }
 
