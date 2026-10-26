@@ -36,6 +36,7 @@ A beautiful, native Markdown viewer and lightweight editor for macOS, Windows an
 | **pnpm 11+ support** — the DOMPurify version pin moved to `pnpm-workspace.yaml`, since newer pnpm no longer reads it from `package.json` | Proposed upstream in [#191](https://github.com/vaibhav-kakde-in/mdhero/pull/191) |
 | **Renderer cleanup and LF line endings** — one shared markdown-it setup, and `.gitattributes` so the test suite passes on Windows checkouts | Proposed upstream in [#191](https://github.com/vaibhav-kakde-in/mdhero/pull/191) |
 | **Callouts and footnotes** — GitHub-style `> [!NOTE]` / `[!TIP]` / `[!IMPORTANT]` / `[!WARNING]` / `[!CAUTION]` boxes, and `[^1]` footnotes, in the reader view and in templates | On [`feature/callouts-footnotes`](https://github.com/good360-smoulec/mdhero/tree/feature/callouts-footnotes); not yet proposed upstream (it builds on #191) |
+| **Page view, headers and footers** — a toolbar toggle shows a templated document as separate pages (Paged.js); Export PDF prints those same pages; templates add running headers and footers with CSS `@page` margin boxes, and the built-ins number their pages | On [`feature/paged-preview`](https://github.com/good360-smoulec/mdhero/tree/feature/paged-preview); not yet proposed upstream (it builds on the callouts branch) |
 
 The aim is to send everything back upstream. This fork's `main` branch is kept identical to upstream; the fork's own changes live on the `windows` branch (the default branch here).
 
