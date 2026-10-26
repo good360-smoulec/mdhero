@@ -321,7 +321,14 @@
   },
   "toc": {
     "onThisPage": "Auf dieser Seite",
-    "resize": "Breite des Inhaltsverzeichnisses ändern"
+    "resize": "Breite des Inhaltsverzeichnisses ändern",
+    "levelsLabel": "Überschriften bis zu einer Ebene zeigen",
+    "showToLevel": "Überschriften bis Ebene {count} zeigen",
+    "expandAll": "Alle Abschnitte ausklappen"
+  },
+  "sections": {
+    "collapse": "Abschnitt einklappen",
+    "expand": "Abschnitt ausklappen"
   },
   "dropzone": {
     "drop": "Zum Öffnen ablegen"

@@ -8,6 +8,8 @@
   import type { LineChanges } from "$lib/utils/line-diff";
   import { blocksToMark } from "$lib/utils/change-marks";
   import { markedChangeCount } from "$lib/stores/docChanges";
+  import { applySections, stripSections } from "$lib/utils/sections";
+  import { revealElement, sectionsActive, setSectionsRedraw } from "$lib/stores/sections";
   import { tocEntries, activeHeadingId, extractToc, isObserverPaused } from "$lib/stores/toc";
   import { aiLookup, setPendingSelection } from "$lib/stores/aiLookup";
   import { t, translate } from "$lib/i18n";
@@ -24,6 +26,8 @@
     paged = false,
     onPagesChange = (_ready: boolean) => {},
     changes = null,
+    collapsed = null,
+    onToggleSection = (_id: string) => {},
   }: {
     html: string;
     /** Lay the document out as a page in this template instead of the reader view. */
@@ -35,6 +39,9 @@
     onPagesChange?: (ready: boolean) => void;
     /** What the last reload from disk changed, to mark on screen. */
     changes?: LineChanges | null;
+    /** Collapsed heading ids; null when sections can't collapse here. */
+    collapsed?: string[] | null;
+    onToggleSection?: (id: string) => void;
     onImageClick?: (src: string, allImages: string[], index: number) => void;
     /**
      * Called when a link to a local file (relative or absolute path, no URL
@@ -270,11 +277,53 @@
       addLinkHandlers();
 
       markChanges(articleEl);
+      drawSections();
 
       // Render Mermaid diagrams
       renderMermaidBlocks();
     });
   });
+
+  // Page view shows the pages as printed, so sections only collapse on the
+  // single sheet and in the reader view.
+  let canCollapse = $derived(collapsed !== null && !showPages);
+
+  function drawSections(set: ReadonlySet<string> = new Set(collapsed ?? [])) {
+    if (!articleEl) return;
+    if (!canCollapse) {
+      stripSections(articleEl);
+      return;
+    }
+    applySections(articleEl, set, { collapse: translate("sections.collapse"), expand: translate("sections.expand") }, (id) =>
+      onToggleSection(id),
+    );
+  }
+
+  $effect(() => {
+    collapsed;
+    canCollapse;
+    $t;
+    drawSections();
+  });
+
+  $effect(() => {
+    if (!canCollapse) return;
+    sectionsActive.set(true);
+    setSectionsRedraw((set) => drawSections(set));
+    return () => {
+      sectionsActive.set(false);
+      setSectionsRedraw(null);
+    };
+  });
+
+  // An in-page link (a footnote, a #heading) can point into a collapsed
+  // section; open it before the browser scrolls there.
+  function revealLinkTarget(e: MouseEvent) {
+    const link = (e.target as Element | null)?.closest?.("a[href^='#']");
+    if (!link) return;
+    const id = decodeURIComponent(link.getAttribute("href")!.slice(1));
+    revealElement(document.getElementById(id));
+  }
 
   // Dismissing or replacing the changes only restyles the blocks on screen;
   // the marks don't move anything, so pages need no new layout.
@@ -364,6 +413,7 @@
     // Listeners don't survive the copy, so the markers saying they're bound
     // must not either; copy buttons don't belong on paper.
     flow.querySelectorAll(".code-copy-btn").forEach((btn) => btn.remove());
+    stripSections(flow);
     flow.querySelectorAll<HTMLElement>("[data-link-bound], [data-tooltip-bound], [data-lightbox-bound]").forEach((el) => {
       delete el.dataset.linkBound;
       delete el.dataset.tooltipBound;
@@ -549,6 +599,7 @@
   <article
     bind:this={articleEl}
     oncontextmenu={handleContextMenu}
+    onclickcapture={revealLinkTarget}
     class="doc-page"
     class:md-content={!showPages}
     class:wrap-code={$settings.wrapCodeBlocks}
@@ -565,6 +616,7 @@
   <article
     bind:this={articleEl}
     oncontextmenu={handleContextMenu}
+    onclickcapture={revealLinkTarget}
     class="md-content prose prose-slate dark:prose-invert max-w-none mx-auto px-8 py-8 transition-all"
     class:wrap-code={$settings.wrapCodeBlocks}
     style="
@@ -888,6 +940,72 @@
   :global(html.dark) article:not([data-template]) :global(.code-copy-btn:hover) {
     background: rgba(58,58,60,0.95);
     color: #e5e5e7;
+  }
+
+  /* Collapsible sections: a chevron in the heading's left margin, faint until
+     the heading is hovered and always shown once collapsed. Hidden only on
+     screen; a print has the whole document. */
+  article :global(.md-section-heading) {
+    position: relative;
+  }
+
+  article :global(.section-toggle) {
+    position: absolute;
+    left: -26px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: #aeaeb2;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.15s, background 0.15s;
+  }
+
+  article :global(.md-section-heading:hover > .section-toggle),
+  article :global(.section-toggle:focus-visible),
+  article :global(.md-section-collapsed > .section-toggle) {
+    opacity: 1;
+  }
+
+  article :global(.section-toggle:hover) {
+    color: #1c1c1e;
+    background: rgba(127, 127, 127, 0.14);
+  }
+
+  :global(html.dark) article:not([data-template]) :global(.section-toggle:hover) {
+    color: #f2f2f7;
+  }
+
+  article :global(.section-toggle svg) {
+    transition: transform 0.15s;
+  }
+
+  article :global(.md-section-collapsed > .section-toggle svg) {
+    transform: rotate(-90deg);
+  }
+
+  article :global(.md-section-collapsed > .section-toggle) {
+    color: #0891b2;
+  }
+
+  @media screen {
+    article :global(.md-section-hidden) {
+      display: none !important;
+    }
+  }
+
+  @media print {
+    article :global(.section-toggle) {
+      display: none !important;
+    }
   }
 
   /* What the last reload changed. Shadows and a background only, so marking or

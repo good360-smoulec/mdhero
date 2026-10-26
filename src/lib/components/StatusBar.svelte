@@ -1,6 +1,7 @@
 <script lang="ts">
   import { document as docStore } from "$lib/stores/document";
   import { clearDocChanges, markedChangeCount } from "$lib/stores/docChanges";
+  import { revealElement } from "$lib/stores/sections";
   import { documentStats, extractDocText, READING_WPM } from "$lib/utils/doc-stats";
   import { t } from "$lib/i18n";
   import StatsPanel from "./StatsPanel.svelte";
@@ -63,6 +64,7 @@
     current = (current + step + blocks.length) % blocks.length;
     document.querySelectorAll(".md-change-current").forEach((el) => el.classList.remove("md-change-current"));
     const block = blocks[current];
+    revealElement(block);
     block.classList.add("md-change-current");
     block.scrollIntoView({ block: "center", behavior: "smooth" });
   }
