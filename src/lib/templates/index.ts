@@ -2,6 +2,7 @@ import baseCss from "./base.css?raw";
 import reportCss from "./report.css?raw";
 import letterCss from "./letter.css?raw";
 import memoCss from "./memo.css?raw";
+import pagedCss from "./paged.css?raw";
 import type { MessageKey } from "$lib/i18n/types";
 
 export type PageSize = "letter" | "a4";
@@ -101,4 +102,9 @@ export function templateStylesheet(tpl: DocTemplate, pageSize: PageSize): string
     `@page { size: ${PAGE_SIZES[pageSize]}; margin: ${tpl.margin}; }`,
     tpl.css,
   ].join("\n");
+}
+
+/** The same, for Paged.js to lay out as separate pages. */
+export function pagedStylesheet(tpl: DocTemplate, pageSize: PageSize): string {
+  return [templateStylesheet(tpl, pageSize), pagedCss].join("\n");
 }

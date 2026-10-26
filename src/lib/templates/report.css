@@ -121,3 +121,13 @@
   border-top: 0.75px solid #666;
   margin: 2em 25%;
 }
+
+/* Page numbers, centred at the foot of every page. */
+@page {
+  @bottom-center {
+    content: counter(page);
+    font-family: "Charter", "Bitstream Charter", "Cambria", "Georgia", "Times New Roman", serif;
+    font-size: 9.5pt;
+    color: #444;
+  }
+}

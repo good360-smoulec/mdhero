@@ -5,6 +5,7 @@ import { get } from "svelte/store";
 import {
   BUILTIN_TEMPLATES,
   findTemplate,
+  pagedStylesheet,
   resolvePageSize,
   resolveTemplate,
   templateStylesheet,
@@ -55,6 +56,33 @@ describe("templateStylesheet", () => {
     const memo = findTemplate("memo")!;
     expect(templateStylesheet(memo, "a4")).toContain("@page { size: 210mm 297mm; margin: 1in; }");
     expect(templateStylesheet(memo, "letter")).toContain("@page { size: 8.5in 11in; margin: 1in; }");
+  });
+});
+
+// The ?raw CSS imports are empty under Vitest, so the files are read from disk.
+describe("page view stylesheet", () => {
+  const pagedCss = readFileSync(resolve(templatesDir, "paged.css"), "utf8");
+
+  it("is the template's stylesheet followed by the page-view rules", () => {
+    const report = findTemplate("report")!;
+    expect(pagedStylesheet(report, "letter").startsWith(templateStylesheet(report, "letter"))).toBe(true);
+  });
+
+  it("takes base.css's single-sheet box off the wrapper Paged.js copies onto each page", () => {
+    expect(pagedCss).toMatch(/\.doc-page\.doc-flow \{[^}]*padding: 0 !important/);
+  });
+
+  it("keeps a template's ::before letterhead to the first page", () => {
+    expect(pagedCss).toMatch(/\.doc-page\.doc-flow\[data-split-from\]::before \{\s*content: none !important/);
+  });
+
+  it("stops a justified template justifying every heading after a page break", () => {
+    expect(pagedCss).toMatch(/\.doc-page\.doc-flow\[data-align-last-split-element\] \{\s*text-align-last: auto !important/);
+  });
+
+  it.each(BUILTIN_TEMPLATES.map((tpl) => [tpl.id]))("numbers the pages of %s", (id) => {
+    const css = readFileSync(resolve(templatesDir, `${id}.css`), "utf8");
+    expect(css).toMatch(/@page \{\s*@bottom-(center|right) \{\s*content: [^;]*counter\(page\)/);
   });
 });
 

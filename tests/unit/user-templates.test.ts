@@ -69,8 +69,35 @@ describe("scopeCss: nothing leaves the app", () => {
     expect(out).toContain("@font-face");
   });
 
-  it("drops @page, which the template's margin owns", () => {
-    expect(scopeCss("@page { margin: 0 } p { a: b }")).not.toContain("@page");
+  it("drops what @page sets on the page itself, which the margin and page size own", () => {
+    expect(scopeCss("@page { margin: 0; size: A3 } p { a: b }")).not.toContain("@page");
+  });
+
+  it("keeps @page margin boxes, for running headers and footers", () => {
+    const out = scopeCss('@page { margin: 0; @bottom-center { content: "Page " counter(page) " of " counter(pages); color: #666 } }');
+    expect(out).toContain('@bottom-center { content: "Page " counter(page) " of " counter(pages); color: #666 }');
+    expect(out).not.toMatch(/margin: 0/);
+  });
+
+  it("keeps :first, :left, :right and :blank pages, and nothing else", () => {
+    expect(scopeCss("@page :first { @top-right { content: none } }")).toContain("@page :first {");
+    expect(scopeCss("@page:left { @top-left { content: 'x' } }")).toContain("@page:left {");
+    expect(scopeCss("@page cover { @top-left { content: 'x' } }")).toBe("");
+    expect(scopeCss("@page :nth(2) { @top-left { content: 'x' } }")).toBe("");
+  });
+
+  it("cleans margin box values like any other, keeping only data: images", () => {
+    const out = scopeCss("@page { @top-left { content: url(https://evil.example/t.png) } @top-right { content: url(data:image/png;base64,AAAA) } }");
+    expect(out).not.toContain("evil.example");
+    expect(out).toContain("content: none");
+    expect(out).toContain("url(data:image/png;base64,AAAA)");
+  });
+
+  it("drops unknown blocks in @page and margin boxes with blocks inside", () => {
+    const out = scopeCss("@page { @top-middle { content: 'x' } @bottom-left { p { color: red } } @bottom-right { content: 'ok' } }");
+    expect(out).not.toContain("top-middle");
+    expect(out).not.toContain("bottom-left");
+    expect(out).toContain("@bottom-right { content: 'ok' }");
   });
 
   it("ignores quotes and braces inside comments", () => {
