@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
   import { document as docStore } from "$lib/stores/document";
+  import { docChanges } from "$lib/stores/docChanges";
   import { tabStore, HOME_TAB_ID, type Tab } from "$lib/stores/tabs";
   import { initRenderer, renderFull, resolveLocalPath, isMarpDoc } from "$lib/renderer/pipeline";
   import {
@@ -1380,6 +1381,7 @@
           pageSize={activePageSize}
           paged={$settings.pagedView || printPaging}
           onPagesChange={handlePagesChange}
+          changes={$settings.highlightChanges && $docStore.filePath ? $docChanges[$docStore.filePath] ?? null : null}
         />
       </main>
     {/if}

@@ -4,7 +4,10 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { document } from "../stores/document";
 import { tabStore } from "../stores/tabs";
-import { renderFull } from "../renderer/pipeline";
+import { renderFull, stripFrontmatter } from "../renderer/pipeline";
+import { settings } from "../stores/settings";
+import { clearDocChanges, setDocChanges } from "../stores/docChanges";
+import { lineChanges } from "../utils/line-diff";
 import { addRecentFile } from "../stores/recents";
 import { pinnedFolders } from "../stores/pinned";
 import { basename } from "../utils/path";
@@ -163,6 +166,15 @@ export async function reloadFile(path: string): Promise<void> {
     const fileName = basename(absolutePath);
 
     await allowAssets(result.assetPaths, absolutePath);
+
+    const before = tabStore.getTabByPath(absolutePath);
+    if (before && before.content !== content && get(settings).highlightChanges) {
+      // Lines of the rendered body, which is what data-source-line counts.
+      const body = (text: string, frontmatter: unknown) => (frontmatter ? stripFrontmatter(text) : text).split(/\r?\n/);
+      setDocChanges(absolutePath, lineChanges(body(before.content, before.frontmatter), body(content, result.frontmatter)));
+    } else if (!get(settings).highlightChanges) {
+      clearDocChanges(absolutePath);
+    }
 
     tabStore.updateTabContent(absolutePath, content, result.html, result.frontmatter, result.wordCount);
 

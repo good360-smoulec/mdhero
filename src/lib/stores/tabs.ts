@@ -213,6 +213,10 @@ function createTabStore() {
     return get(tabs).find((t) => t.id === id) ?? null;
   }
 
+  function getTabByPath(filePath: string): Tab | null {
+    return get(tabs).find((t) => t.filePath === filePath) ?? null;
+  }
+
   function reorderTabs(fromIndex: number, toIndex: number) {
     tabs.update((ts) => {
       const arr = [...ts];
@@ -274,6 +278,7 @@ function createTabStore() {
     switchTab,
     updateTabContent,
     getActiveTab,
+    getTabByPath,
     reorderTabs,
     goHome,
     setEditing,

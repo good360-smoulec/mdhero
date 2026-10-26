@@ -25,6 +25,7 @@ const BOOLEANS = [
   ["wrapCodeBlocks", false],
   ["autoCheckUpdates", true],
   ["pagedView", false],
+  ["highlightChanges", true],
 ] as const;
 
 describe.each(BOOLEANS)("the stored %s setting", (key, fallback) => {

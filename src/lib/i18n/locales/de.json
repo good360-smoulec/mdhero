@@ -75,7 +75,77 @@
     "minRead": "1 Min. Lesezeit",
     "minReadN": "{count} Min. Lesezeit",
     "tokens": "~{count} Tokens",
-    "tokensK": "~{count}k Tokens"
+    "tokensK": "~{count}k Tokens",
+    "statsTitle": "Dokumentstatistik",
+    "changes": {
+      "one": "{count} Änderung",
+      "other": "{count} Änderungen"
+    },
+    "prevChange": "Vorherige Änderung",
+    "nextChange": "Nächste Änderung",
+    "dismissChanges": "Markierungen der Änderungen entfernen"
+  },
+  "stats": {
+    "title": "Dokumentstatistik",
+    "length": "Umfang",
+    "words": "Wörter",
+    "characters": "Zeichen",
+    "charactersNoSpaces": "Zeichen ohne Leerzeichen",
+    "sentences": "Sätze",
+    "paragraphs": "Absätze",
+    "headings": "Überschriften",
+    "contains": "Enthält außerdem",
+    "tables": {
+      "one": "{count} Tabelle",
+      "other": "{count} Tabellen"
+    },
+    "codeBlocks": {
+      "one": "{count} Codeblock",
+      "other": "{count} Codeblöcke"
+    },
+    "images": {
+      "one": "{count} Bild",
+      "other": "{count} Bilder"
+    },
+    "links": {
+      "one": "{count} Link",
+      "other": "{count} Links"
+    },
+    "time": "Zeit",
+    "readingTime": "Lesezeit",
+    "speakingTime": "Sprechzeit",
+    "minutes": {
+      "one": "etwa {count} Min.",
+      "other": "etwa {count} Min."
+    },
+    "underMinute": "unter 1 Min.",
+    "timeHint": "Bei {read} Wörtern pro Minute beim Lesen und {speak} beim Vorlesen.",
+    "readability": "Lesbarkeit",
+    "ease": "Lesefreundlichkeit",
+    "grade": "Klassenstufe",
+    "gradeValue": "US-Klassenstufe {count}",
+    "averageSentence": "Durchschnittlicher Satz",
+    "wordsN": {
+      "one": "{count} Wort",
+      "other": "{count} Wörter"
+    },
+    "longSentences": "Sätze mit über {count} Wörtern",
+    "longest": "Längster Satz",
+    "readabilityHint": "Flesch-Werte: Die Lesefreundlichkeit reicht von 0 (sehr schwer) bis 100 (sehr leicht); 60–70 entspricht einfachem Englisch. Code wird nicht berücksichtigt.",
+    "readabilityUnavailable": "Lesbarkeitswerte brauchen mindestens einige Sätze englischen Text.",
+    "levelVeryEasy": "sehr leicht",
+    "levelEasy": "leicht",
+    "levelFairlyEasy": "ziemlich leicht",
+    "levelPlain": "einfaches Englisch",
+    "levelFairlyDifficult": "ziemlich schwer",
+    "levelDifficult": "schwer",
+    "levelVeryDifficult": "sehr schwer",
+    "repeated": "Häufigste Wörter",
+    "repeatedNone": "Kein Wort kommt drei- oder mehrmals vor.",
+    "repeatedHint": "Häufige englische Wörter wie „which“ und „would“ werden ausgelassen.",
+    "tokens": "KI-Tokens",
+    "tokensExplain": "KI-Modelle wie Claude und ChatGPT lesen Text in Tokens, Stücken von etwa vier Zeichen englischen Texts. Dies schätzt, wie viel vom Kontext eines Modells (was es auf einmal aufnehmen kann) diese Datei beim Einfügen oder Anhängen belegt. Gezählt wird die Datei wie geschrieben, samt Markdown-Zeichen; Code sowie chinesischer, japanischer oder koreanischer Text brauchen mehr Tokens. Die genaue Zahl hängt vom Modell ab.",
+    "close": "Schließen"
   },
   "tabbar": {
     "unsaved": "Ungespeicherte Änderungen",
@@ -225,7 +295,9 @@
     "pageSizeHint": "Papierformat für Vorlagen und PDF-Export, sofern ein Dokument nicht {code} festlegt.",
     "pageSizeLetter": "US Letter",
     "pageSizeA4": "A4",
-    "templatesHint": "Eigene Vorlagen liegen im Vorlagenordner, je ein Ordner mit template.css und template.json. Duplizieren Sie eine Vorlage, um darauf aufzubauen; Änderungen erscheinen, sobald Sie die Datei speichern."
+    "templatesHint": "Eigene Vorlagen liegen im Vorlagenordner, je ein Ordner mit template.css und template.json. Duplizieren Sie eine Vorlage, um darauf aufzubauen; Änderungen erscheinen, sobald Sie die Datei speichern.",
+    "highlightChanges": "Änderungen hervorheben",
+    "highlightChangesHint": "Wenn sich eine geöffnete Datei auf dem Datenträger ändert, werden die geänderten Absätze markiert, bis du die Markierung in der Statusleiste entfernst."
   },
   "templates": {
     "none": "Keine (Leseansicht)",

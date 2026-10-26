@@ -5,6 +5,9 @@
   import { settings, fontFamilyMap, getContentMaxWidth, DEFAULT_FONT_SIZE } from "$lib/stores/settings";
   import { templateStylesheet, pagedStylesheet, type DocTemplate, type PageSize } from "$lib/templates";
   import type { Previewer } from "pagedjs";
+  import type { LineChanges } from "$lib/utils/line-diff";
+  import { blocksToMark } from "$lib/utils/change-marks";
+  import { markedChangeCount } from "$lib/stores/docChanges";
   import { tocEntries, activeHeadingId, extractToc, isObserverPaused } from "$lib/stores/toc";
   import { aiLookup, setPendingSelection } from "$lib/stores/aiLookup";
   import { t, translate } from "$lib/i18n";
@@ -20,6 +23,7 @@
     pageSize = "letter",
     paged = false,
     onPagesChange = (_ready: boolean) => {},
+    changes = null,
   }: {
     html: string;
     /** Lay the document out as a page in this template instead of the reader view. */
@@ -29,6 +33,8 @@
     paged?: boolean;
     /** False while pages are being laid out, true once they're on screen. */
     onPagesChange?: (ready: boolean) => void;
+    /** What the last reload from disk changed, to mark on screen. */
+    changes?: LineChanges | null;
     onImageClick?: (src: string, allImages: string[], index: number) => void;
     /**
      * Called when a link to a local file (relative or absolute path, no URL
@@ -105,7 +111,7 @@
 
   async function renderMermaidBlocks() {
     if (!articleEl) return;
-    const blocks = articleEl.querySelectorAll("code.language-mermaid");
+    const blocks = articleEl.querySelectorAll<HTMLElement>("code.language-mermaid");
     if (blocks.length === 0) return;
 
     initMermaid();
@@ -128,6 +134,7 @@
         // because the Quick Look extension renders diagrams too and the two
         // paths must not drift apart; see the notes there before changing it.
         container.innerHTML = DOMPurify.sanitize(svg, MERMAID_SANITIZE_CONFIG);
+        if (block.dataset.sourceLine) container.dataset.sourceLine = block.dataset.sourceLine;
         pre.replaceWith(container);
       } catch {
         // Leave the code block as-is if Mermaid fails
@@ -262,10 +269,48 @@
       // Open external links in system browser
       addLinkHandlers();
 
+      markChanges(articleEl);
+
       // Render Mermaid diagrams
       renderMermaidBlocks();
     });
   });
+
+  // Dismissing or replacing the changes only restyles the blocks on screen;
+  // the marks don't move anything, so pages need no new layout.
+  $effect(() => {
+    changes;
+    markChanges(showPages ? pagesEl : articleEl);
+  });
+
+  /**
+   * Mark the blocks the last reload changed. A block split across two pages is
+   * marked on both, but counted once.
+   */
+  function markChanges(root: HTMLElement | undefined) {
+    if (!root) return;
+    root.querySelectorAll(".md-changed, .md-removed-before, .md-removed-after").forEach((el) => {
+      el.classList.remove("md-changed", "md-removed-before", "md-removed-after");
+    });
+    if (!changes) {
+      markedChangeCount.set(0);
+      return;
+    }
+    const blocks = Array.from(root.querySelectorAll<HTMLElement>("[data-source-line]"));
+    const marks = blocksToMark(blocks.map((el) => Number(el.dataset.sourceLine)), changes);
+    const counted = new Set<number>();
+    for (const tagged of blocks) {
+      const line = Number(tagged.dataset.sourceLine);
+      // A fenced code block carries its line on the <code>; mark the whole <pre>.
+      const el = tagged.tagName === "CODE" && tagged.parentElement?.tagName === "PRE" ? tagged.parentElement : tagged;
+      el.dataset.sourceLine = String(line);
+      if (marks.changed.has(line)) el.classList.add("md-changed");
+      if (marks.removedBefore.has(line)) el.classList.add("md-removed-before");
+      if (marks.removedAfter === line) el.classList.add("md-removed-after");
+      if (marks.changed.has(line) || marks.removedBefore.has(line) || marks.removedAfter === line) counted.add(line);
+    }
+    markedChangeCount.set(counted.size);
+  }
 
   /**
    * Paged.js 0.4.3 writes each page's `string-set` values (a running header's
@@ -363,6 +408,7 @@
 
     tocEntries.set(extractToc(pagesEl));
     setupTocObserver(pagesEl);
+    markChanges(pagesEl);
     addImageClickHandlers(pagesEl);
     addLinkTooltips(pagesEl);
     addLinkHandlers(pagesEl);
@@ -842,6 +888,76 @@
   :global(html.dark) article:not([data-template]) :global(.code-copy-btn:hover) {
     background: rgba(58,58,60,0.95);
     color: #e5e5e7;
+  }
+
+  /* What the last reload changed. Shadows and a background only, so marking or
+     clearing moves nothing and laid-out pages stay as they are. */
+  /* The tint runs 14px past both sides; the bar is a stripe at its far left,
+     clear of the text whatever the block's own indent. */
+  article :global(.md-changed) {
+    position: relative;
+    background-color: rgba(255, 196, 0, 0.12);
+    box-shadow: 14px 0 0 0 rgba(255, 196, 0, 0.12), -14px 0 0 0 rgba(255, 196, 0, 0.12);
+  }
+
+  article :global(.md-changed)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -14px;
+    width: 3px;
+    border-radius: 2px;
+    background: #e8a400;
+    pointer-events: none;
+  }
+
+  /* Tables and code scroll sideways, which clips the stripe, so theirs is a
+     shadow on their own left edge. */
+  article :global(table.md-changed),
+  article :global(pre.md-changed) {
+    box-shadow: -4px 0 0 0 #e8a400, 14px 0 0 0 rgba(255, 196, 0, 0.12), -14px 0 0 0 rgba(255, 196, 0, 0.12);
+  }
+
+  article :global(table.md-changed)::after,
+  article :global(pre.md-changed)::after {
+    content: none;
+  }
+
+  article :global(.md-removed-before) {
+    box-shadow: 0 -0.6em 0 -0.45em #e5484d;
+  }
+
+  article :global(.md-removed-after) {
+    box-shadow: 0 0.6em 0 -0.45em #e5484d;
+  }
+
+  article :global(.md-changed.md-removed-before) {
+    box-shadow: 0 -0.6em 0 -0.45em #e5484d, 14px 0 0 0 rgba(255, 196, 0, 0.12), -14px 0 0 0 rgba(255, 196, 0, 0.12);
+  }
+
+  :global(html.dark) article:not([data-template]) :global(.md-changed) {
+    background-color: rgba(255, 196, 0, 0.1);
+  }
+
+  /* The block the status bar's arrows just moved to. */
+  article :global(.md-change-current) {
+    outline: 2px solid rgba(232, 164, 0, 0.55);
+    outline-offset: 4px;
+  }
+
+  @media print {
+    article :global(.md-changed),
+    article :global(.md-removed-before),
+    article :global(.md-removed-after) {
+      background-color: transparent !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    article :global(.md-changed)::after {
+      display: none;
+    }
   }
 
   /* Page view (Paged.js). The paper stays white in dark mode, like the single

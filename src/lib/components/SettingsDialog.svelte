@@ -143,6 +143,19 @@
 
           <label class="setting-row">
             <div class="setting-text">
+              <span class="setting-label">{$t('settings.highlightChanges')}</span>
+              <span class="setting-hint">{$t('settings.highlightChangesHint')}</span>
+            </div>
+            <input
+              type="checkbox"
+              checked={$settings.highlightChanges}
+              onchange={(e) => settings.update((s) => ({ ...s, highlightChanges: e.currentTarget.checked }))}
+              class="setting-switch"
+            />
+          </label>
+
+          <label class="setting-row">
+            <div class="setting-text">
               <span class="setting-label">{$t('settings.autoCheckUpdates')}</span>
               <span class="setting-hint">{$t('settings.autoCheckUpdatesHint')}</span>
             </div>

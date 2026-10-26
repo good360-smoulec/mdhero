@@ -7,6 +7,7 @@ const updateTabContent = vi.fn();
 const addTab = vi.fn((_path: string) => "tab-1");
 const rebindPath = vi.fn();
 let activeTab: { filePath: string } | null = null;
+let tabOnDisk: { filePath: string; content: string; frontmatter: null } | null = null;
 
 // Node has no DOM for DOMPurify; the renderer is not under test here.
 vi.mock("dompurify", () => ({ default: { sanitize: (html: string) => html } }));
@@ -17,9 +18,12 @@ vi.mock("../../src/lib/stores/pinned", () => ({ pinnedFolders: { subscribe: (run
 vi.mock("../../src/lib/stores/recents", () => ({ addRecentFile: vi.fn() }));
 vi.mock("../../src/lib/stores/document", () => ({ document: { set: documentSet } }));
 vi.mock("../../src/lib/stores/tabs", () => ({
-  tabStore: { updateTabContent, addTab, rebindPath, setEditing: vi.fn(), getActiveTab: () => activeTab },
+  tabStore: { updateTabContent, addTab, rebindPath, setEditing: vi.fn(), getActiveTab: () => activeTab, getTabByPath: () => tabOnDisk },
 }));
 
+const { docChanges } = await import("../../src/lib/stores/docChanges");
+const { settings } = await import("../../src/lib/stores/settings");
+const { get } = await import("svelte/store");
 const { reloadFile, openFile, openFileDialog, saveAsNewDocument, watchFile, unwatchFile } = await import("../../src/lib/tauri/files");
 
 const calls = (cmd: string) => invoke.mock.calls.filter((c) => c[0] === cmd).map((c) => c[1]);
@@ -28,6 +32,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(open).mockReset();
   activeTab = null;
+  tabOnDisk = null;
+  docChanges.set({});
+  settings.update((v) => ({ ...v, highlightChanges: true }));
   invoke.mockImplementation(async (cmd: string, args: any) => {
     if (cmd === "resolve_path") return args.path;
     if (cmd === "read_markdown_file") return "# from disk";
@@ -90,6 +97,19 @@ describe("reloadFile routing", () => {
     await reloadFile("/docs/a.md");
     expect(updateTabContent).toHaveBeenCalledTimes(1);
     expect(documentSet).not.toHaveBeenCalled();
+  });
+
+  it("records which lines the reload changed, for the screen to mark", async () => {
+    tabOnDisk = { filePath: "/docs/a.md", content: "# old title", frontmatter: null };
+    await reloadFile("/docs/a.md");
+    expect(get(docChanges)["/docs/a.md"]).toMatchObject({ changed: [0], removedBefore: [] });
+  });
+
+  it("records nothing when highlighting changes is turned off", async () => {
+    settings.update((v) => ({ ...v, highlightChanges: false }));
+    tabOnDisk = { filePath: "/docs/a.md", content: "# old title", frontmatter: null };
+    await reloadFile("/docs/a.md");
+    expect(get(docChanges)["/docs/a.md"]).toBeUndefined();
   });
 });
 
