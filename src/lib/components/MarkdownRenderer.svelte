@@ -557,6 +557,85 @@
     accent-color: #0891B2;
   }
 
+  /* Callouts: GitHub's > [!NOTE] alerts, in GitHub's colours */
+  article:not([data-template]) :global(.markdown-alert) {
+    --alert-color: #0969da;
+    margin: 1.25em 0;
+    padding: 0.5em 1em;
+    border-left: 3px solid var(--alert-color);
+  }
+
+  article:not([data-template]) :global(.markdown-alert-tip) { --alert-color: #1a7f37; }
+  article:not([data-template]) :global(.markdown-alert-important) { --alert-color: #8250df; }
+  article:not([data-template]) :global(.markdown-alert-warning) { --alert-color: #9a6700; }
+  article:not([data-template]) :global(.markdown-alert-caution) { --alert-color: #cf222e; }
+
+  :global(html.dark) article:not([data-template]) :global(.markdown-alert) { --alert-color: #4493f8; }
+  :global(html.dark) article:not([data-template]) :global(.markdown-alert-tip) { --alert-color: #3fb950; }
+  :global(html.dark) article:not([data-template]) :global(.markdown-alert-important) { --alert-color: #ab7df8; }
+  :global(html.dark) article:not([data-template]) :global(.markdown-alert-warning) { --alert-color: #d29922; }
+  :global(html.dark) article:not([data-template]) :global(.markdown-alert-caution) { --alert-color: #f85149; }
+
+  article:not([data-template]) :global(.markdown-alert > :first-child) {
+    margin-top: 0;
+  }
+
+  article:not([data-template]) :global(.markdown-alert > :last-child) {
+    margin-bottom: 0;
+  }
+
+  article:not([data-template]) :global(.markdown-alert-title) {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-bottom: 0.25em;
+    font-weight: 600;
+    color: var(--alert-color);
+  }
+
+  article:not([data-template]) :global(.markdown-alert-title + *) {
+    margin-top: 0;
+  }
+
+  article :global(.markdown-alert-icon) {
+    width: 1em;
+    height: 1em;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Footnotes */
+  article:not([data-template]) :global(.footnote-ref a) {
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  article:not([data-template]) :global(.footnotes) {
+    font-size: 0.875em;
+    color: #636366;
+  }
+
+  :global(html.dark) article:not([data-template]) :global(.footnotes) {
+    color: #8e8e93;
+  }
+
+  article:not([data-template]) :global(hr.footnotes-sep) {
+    margin: 2.5em 0 1em;
+  }
+
+  article:not([data-template]) :global(.footnote-backref) {
+    text-decoration: none;
+  }
+
+  article:not([data-template]) :global(.footnote-item:target) {
+    background: rgba(8, 145, 178, 0.08);
+    border-radius: 4px;
+  }
+
   /* Links */
   article:not([data-template]) :global(a) {
     color: #0891B2;

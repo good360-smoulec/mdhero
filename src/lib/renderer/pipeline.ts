@@ -3,9 +3,11 @@ import DOMPurify from "dompurify";
 import taskLists from "markdown-it-task-lists";
 import anchor from "markdown-it-anchor";
 import texmath from "markdown-it-texmath";
+import footnote from "markdown-it-footnote";
 import katex from "katex";
 import hljs from "highlight.js/lib/core";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { calloutsPlugin } from "./callouts";
 
 // Register common languages
 import javascript from "highlight.js/lib/languages/javascript";
@@ -265,6 +267,11 @@ function createMarkdownIt(): MarkdownIt {
   });
 
   instance.use(taskLists, { enabled: false, label: true });
+  instance.use(calloutsPlugin);
+  instance.use(footnote);
+  // A bare superscript number, as GitHub shows it, rather than the plugin's `[1]`
+  // or `[1:1]` for a note cited twice.
+  instance.renderer.rules.footnote_caption = (tokens, idx) => String(tokens[idx].meta.id + 1);
   instance.use(anchor, {
     permalink: false,
     slugify: (s: string) =>
