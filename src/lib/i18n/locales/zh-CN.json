@@ -74,7 +74,70 @@
     "minRead": "1 分钟阅读",
     "minReadN": "{count} 分钟阅读",
     "tokens": "约 {count} tokens",
-    "tokensK": "约 {count}k tokens"
+    "tokensK": "约 {count}k tokens",
+    "statsTitle": "文档统计",
+    "changes": {
+      "other": "{count} 处更改"
+    },
+    "prevChange": "上一处更改",
+    "nextChange": "下一处更改",
+    "dismissChanges": "清除更改标记"
+  },
+  "stats": {
+    "title": "文档统计",
+    "length": "篇幅",
+    "words": "字数",
+    "characters": "字符数",
+    "charactersNoSpaces": "字符数（不含空格）",
+    "sentences": "句子",
+    "paragraphs": "段落",
+    "headings": "标题",
+    "contains": "还包含",
+    "tables": {
+      "other": "{count} 个表格"
+    },
+    "codeBlocks": {
+      "other": "{count} 个代码块"
+    },
+    "images": {
+      "other": "{count} 张图片"
+    },
+    "links": {
+      "other": "{count} 个链接"
+    },
+    "time": "时间",
+    "readingTime": "阅读时间",
+    "speakingTime": "朗读时间",
+    "minutes": {
+      "other": "约 {count} 分钟"
+    },
+    "underMinute": "不到 1 分钟",
+    "timeHint": "按每分钟阅读 {read} 词、朗读 {speak} 词计算。",
+    "readability": "可读性",
+    "ease": "阅读容易度",
+    "grade": "年级水平",
+    "gradeValue": "美国 {count} 年级",
+    "averageSentence": "平均句长",
+    "wordsN": {
+      "other": "{count} 词"
+    },
+    "longSentences": "超过 {count} 词的句子",
+    "longest": "最长的句子",
+    "readabilityHint": "Flesch 评分：阅读容易度从 0（很难）到 100（很容易），60–70 为浅显英语。不计代码。",
+    "readabilityUnavailable": "可读性评分需要至少几句英文文本。",
+    "levelVeryEasy": "很容易",
+    "levelEasy": "容易",
+    "levelFairlyEasy": "较容易",
+    "levelPlain": "浅显英语",
+    "levelFairlyDifficult": "较难",
+    "levelDifficult": "难",
+    "levelVeryDifficult": "很难",
+    "repeated": "最常用的词",
+    "repeatedNone": "没有出现三次或以上的词。",
+    "repeatedHint": "已略去 “which”、“would” 等常见英文词。",
+    "tokens": "AI tokens",
+    "tokensExplain": "Claude、ChatGPT 等 AI 模型以 token 为单位读取文本，英文中每个 token 约四个字符。此处估算粘贴或附加此文件时会占用模型多少上下文（模型一次能接收的内容）。按文件原文计算，包括 Markdown 符号；代码以及中文、日文、韩文文本会占用更多 token。具体数值因模型而异。",
+    "close": "关闭"
   },
   "tabbar": {
     "unsaved": "未保存的更改",
@@ -224,7 +287,9 @@
     "pageSizeHint": "模板和 PDF 导出使用的纸张大小，除非文档设置了 {code}。",
     "pageSizeLetter": "美国信纸",
     "pageSizeA4": "A4",
-    "templatesHint": "你的模板位于模板文件夹中，每个模板一个文件夹，包含 template.css 和 template.json。复制一个模板即可在其基础上修改；保存文件后更改会立即生效。"
+    "templatesHint": "你的模板位于模板文件夹中，每个模板一个文件夹，包含 template.css 和 template.json。复制一个模板即可在其基础上修改；保存文件后更改会立即生效。",
+    "highlightChanges": "标记更改内容",
+    "highlightChangesHint": "当打开的文件在磁盘上发生变化时，标记有更改的段落，直到你在状态栏中清除。"
   },
   "templates": {
     "none": "无（阅读视图）",

@@ -91,7 +91,8 @@ describe("<div dir> wrapper lines (#95)", () => {
     const html = render('<div dir="rtl">\n\n```\nconst x = 1;\n```\n\n</div>');
     expect(html).not.toContain('<pre dir=');
     expect(html).not.toContain('<code dir=');
-    expect(html).toContain("<pre><code>");
+    // The code element carries its source line, never a direction.
+    expect(html).toMatch(/<pre><code(?: data-source-line="\d+")?>/);
   });
 });
 

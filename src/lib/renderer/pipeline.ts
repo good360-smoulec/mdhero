@@ -132,14 +132,20 @@ export function stripFrontmatter(markdown: string): string {
 let md: MarkdownIt | null = null;
 let initialized = false;
 
+// Blocks that are a single token rather than an open/close pair. A fence's
+// attributes land on its <code>, an indented block's and a rule's on the
+// element itself; math blocks render without attributes, so aren't listed.
+const SINGLE_TOKEN_BLOCKS = new Set(["fence", "code_block", "hr"]);
+
 /**
  * Stamp top-level block elements with `data-source-line="N"` (0-indexed line in
- * source markdown). Used by the scroll-sync logic to map view ↔ raw ↔ editor.
+ * source markdown). Used by the scroll-sync logic to map view ↔ raw ↔ editor,
+ * and to mark what a reload changed.
  */
 function addSourceLinePlugin(mdInstance: MarkdownIt) {
   mdInstance.core.ruler.push("source-line", (state) => {
     for (const token of state.tokens) {
-      if (token.map && token.level === 0 && token.type.endsWith("_open")) {
+      if (token.map && token.level === 0 && (token.type.endsWith("_open") || SINGLE_TOKEN_BLOCKS.has(token.type))) {
         token.attrSet("data-source-line", String(token.map[0]));
       }
     }

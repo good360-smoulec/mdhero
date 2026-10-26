@@ -75,7 +75,77 @@
     "minRead": "1 min de lectura",
     "minReadN": "{count} min de lectura",
     "tokens": "~{count} tokens",
-    "tokensK": "~{count}k tokens"
+    "tokensK": "~{count}k tokens",
+    "statsTitle": "Estadísticas del documento",
+    "changes": {
+      "one": "{count} cambio",
+      "other": "{count} cambios"
+    },
+    "prevChange": "Cambio anterior",
+    "nextChange": "Cambio siguiente",
+    "dismissChanges": "Quitar el resaltado de los cambios"
+  },
+  "stats": {
+    "title": "Estadísticas del documento",
+    "length": "Extensión",
+    "words": "Palabras",
+    "characters": "Caracteres",
+    "charactersNoSpaces": "Caracteres sin espacios",
+    "sentences": "Oraciones",
+    "paragraphs": "Párrafos",
+    "headings": "Encabezados",
+    "contains": "También contiene",
+    "tables": {
+      "one": "{count} tabla",
+      "other": "{count} tablas"
+    },
+    "codeBlocks": {
+      "one": "{count} bloque de código",
+      "other": "{count} bloques de código"
+    },
+    "images": {
+      "one": "{count} imagen",
+      "other": "{count} imágenes"
+    },
+    "links": {
+      "one": "{count} enlace",
+      "other": "{count} enlaces"
+    },
+    "time": "Tiempo",
+    "readingTime": "Tiempo de lectura",
+    "speakingTime": "Tiempo en voz alta",
+    "minutes": {
+      "one": "unos {count} min",
+      "other": "unos {count} min"
+    },
+    "underMinute": "menos de 1 min",
+    "timeHint": "A {read} palabras por minuto leyendo y {speak} leyendo en voz alta.",
+    "readability": "Legibilidad",
+    "ease": "Facilidad de lectura",
+    "grade": "Nivel escolar",
+    "gradeValue": "Grado escolar de EE. UU. {count}",
+    "averageSentence": "Oración media",
+    "wordsN": {
+      "one": "{count} palabra",
+      "other": "{count} palabras"
+    },
+    "longSentences": "Oraciones de más de {count} palabras",
+    "longest": "Oración más larga",
+    "readabilityHint": "Índices de Flesch: la facilidad de lectura va de 0 (muy difícil) a 100 (muy fácil); 60–70 es inglés sencillo. El código no se cuenta.",
+    "readabilityUnavailable": "Los índices de legibilidad necesitan al menos unas cuantas oraciones en inglés.",
+    "levelVeryEasy": "muy fácil",
+    "levelEasy": "fácil",
+    "levelFairlyEasy": "bastante fácil",
+    "levelPlain": "inglés sencillo",
+    "levelFairlyDifficult": "bastante difícil",
+    "levelDifficult": "difícil",
+    "levelVeryDifficult": "muy difícil",
+    "repeated": "Palabras más usadas",
+    "repeatedNone": "Ninguna palabra aparece tres veces o más.",
+    "repeatedHint": "Se omiten palabras comunes en inglés como «which» y «would».",
+    "tokens": "Tokens de IA",
+    "tokensExplain": "Los modelos de IA como Claude y ChatGPT leen el texto en tokens, fragmentos de unos cuatro caracteres de texto en inglés. Esto estima cuánto del contexto de un modelo (lo que puede asimilar de una vez) ocupa este archivo al pegarlo o adjuntarlo. Cuenta el archivo tal como está escrito, con los símbolos de markdown; el código y el texto en chino, japonés o coreano usan más tokens. La cifra exacta depende del modelo.",
+    "close": "Cerrar"
   },
   "tabbar": {
     "unsaved": "Cambios sin guardar",
@@ -225,7 +295,9 @@
     "pageSizeHint": "Tamaño de papel para plantillas y exportación a PDF, salvo que el documento indique {code}.",
     "pageSizeLetter": "Carta (EE. UU.)",
     "pageSizeA4": "A4",
-    "templatesHint": "Tus plantillas están en la carpeta de plantillas, una carpeta por plantilla con template.css y template.json. Duplica una plantilla para partir de ella; los cambios aparecen en cuanto guardas el archivo."
+    "templatesHint": "Tus plantillas están en la carpeta de plantillas, una carpeta por plantilla con template.css y template.json. Duplica una plantilla para partir de ella; los cambios aparecen en cuanto guardas el archivo.",
+    "highlightChanges": "Resaltar lo que cambió",
+    "highlightChangesHint": "Cuando un archivo abierto cambia en el disco, marca los párrafos modificados hasta que quites el resaltado desde la barra de estado."
   },
   "templates": {
     "none": "Ninguna (vista de lectura)",

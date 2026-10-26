@@ -30,7 +30,7 @@ describe("UTF-8 BOM (#122)", () => {
       ["bullet list", "- only item\n", /<ul[^>]*>/],
       ["ordered list", "1. only item\n", /<ol[^>]*>/],
       ["blockquote", "> quoted\n", /<blockquote[^>]*>/],
-      ["fenced code", "```js\nconst a = 1;\n```\n", /<pre><code class="language-js"/],
+      ["fenced code", "```js\nconst a = 1;\n```\n", /<pre><code[^>]* class="language-js"/],
     ];
 
     for (const [name, body, expected] of constructs) {

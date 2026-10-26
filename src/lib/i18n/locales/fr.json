@@ -75,7 +75,77 @@
     "minRead": "1 min de lecture",
     "minReadN": "{count} min de lecture",
     "tokens": "~{count} tokens",
-    "tokensK": "~{count}k tokens"
+    "tokensK": "~{count}k tokens",
+    "statsTitle": "Statistiques du document",
+    "changes": {
+      "one": "{count} modification",
+      "other": "{count} modifications"
+    },
+    "prevChange": "Modification précédente",
+    "nextChange": "Modification suivante",
+    "dismissChanges": "Effacer le surlignage des modifications"
+  },
+  "stats": {
+    "title": "Statistiques du document",
+    "length": "Longueur",
+    "words": "Mots",
+    "characters": "Caractères",
+    "charactersNoSpaces": "Caractères sans espaces",
+    "sentences": "Phrases",
+    "paragraphs": "Paragraphes",
+    "headings": "Titres",
+    "contains": "Contient aussi",
+    "tables": {
+      "one": "{count} tableau",
+      "other": "{count} tableaux"
+    },
+    "codeBlocks": {
+      "one": "{count} bloc de code",
+      "other": "{count} blocs de code"
+    },
+    "images": {
+      "one": "{count} image",
+      "other": "{count} images"
+    },
+    "links": {
+      "one": "{count} lien",
+      "other": "{count} liens"
+    },
+    "time": "Temps",
+    "readingTime": "Temps de lecture",
+    "speakingTime": "Temps à voix haute",
+    "minutes": {
+      "one": "environ {count} min",
+      "other": "environ {count} min"
+    },
+    "underMinute": "moins d'1 min",
+    "timeHint": "À {read} mots par minute en lecture et {speak} à voix haute.",
+    "readability": "Lisibilité",
+    "ease": "Facilité de lecture",
+    "grade": "Niveau scolaire",
+    "gradeValue": "Niveau scolaire américain {count}",
+    "averageSentence": "Phrase moyenne",
+    "wordsN": {
+      "one": "{count} mot",
+      "other": "{count} mots"
+    },
+    "longSentences": "Phrases de plus de {count} mots",
+    "longest": "Phrase la plus longue",
+    "readabilityHint": "Scores de Flesch : la facilité de lecture va de 0 (très difficile) à 100 (très facile) ; 60–70 correspond à un anglais simple. Le code n'est pas compté.",
+    "readabilityUnavailable": "Les scores de lisibilité demandent au moins quelques phrases de texte en anglais.",
+    "levelVeryEasy": "très facile",
+    "levelEasy": "facile",
+    "levelFairlyEasy": "assez facile",
+    "levelPlain": "anglais simple",
+    "levelFairlyDifficult": "assez difficile",
+    "levelDifficult": "difficile",
+    "levelVeryDifficult": "très difficile",
+    "repeated": "Mots les plus utilisés",
+    "repeatedNone": "Aucun mot n'apparaît trois fois ou plus.",
+    "repeatedHint": "Les mots anglais courants comme « which » et « would » sont ignorés.",
+    "tokens": "Tokens d'IA",
+    "tokensExplain": "Les modèles d'IA comme Claude et ChatGPT lisent le texte en tokens, des morceaux d'environ quatre caractères de texte anglais. Ceci estime la part du contexte d'un modèle (ce qu'il peut prendre en compte d'un coup) qu'occupe ce fichier quand vous le collez ou le joignez. Le fichier est compté tel qu'écrit, symboles markdown compris ; le code et le texte chinois, japonais ou coréen prennent plus de tokens. Le nombre exact dépend du modèle.",
+    "close": "Fermer"
   },
   "tabbar": {
     "unsaved": "Modifications non enregistrées",
@@ -225,7 +295,9 @@
     "pageSizeHint": "Format du papier pour les modèles et l'export PDF, sauf si le document définit {code}.",
     "pageSizeLetter": "Lettre US",
     "pageSizeA4": "A4",
-    "templatesHint": "Vos modèles se trouvent dans le dossier des modèles, un dossier par modèle avec template.css et template.json. Dupliquez un modèle pour partir de celui-ci ; les modifications s'affichent dès que vous enregistrez le fichier."
+    "templatesHint": "Vos modèles se trouvent dans le dossier des modèles, un dossier par modèle avec template.css et template.json. Dupliquez un modèle pour partir de celui-ci ; les modifications s'affichent dès que vous enregistrez le fichier.",
+    "highlightChanges": "Surligner les modifications",
+    "highlightChangesHint": "Quand un fichier ouvert change sur le disque, les paragraphes modifiés sont marqués jusqu'à ce que vous les effaciez depuis la barre d'état."
   },
   "templates": {
     "none": "Aucun (vue lecture)",

@@ -75,7 +75,77 @@
     "minRead": "1 min read",
     "minReadN": "{count} min read",
     "tokens": "~{count} tokens",
-    "tokensK": "~{count}k tokens"
+    "tokensK": "~{count}k tokens",
+    "statsTitle": "Document statistics",
+    "changes": {
+      "one": "{count} change",
+      "other": "{count} changes"
+    },
+    "prevChange": "Previous change",
+    "nextChange": "Next change",
+    "dismissChanges": "Clear the change highlights"
+  },
+  "stats": {
+    "title": "Document statistics",
+    "length": "Length",
+    "words": "Words",
+    "characters": "Characters",
+    "charactersNoSpaces": "Characters without spaces",
+    "sentences": "Sentences",
+    "paragraphs": "Paragraphs",
+    "headings": "Headings",
+    "contains": "Also contains",
+    "tables": {
+      "one": "{count} table",
+      "other": "{count} tables"
+    },
+    "codeBlocks": {
+      "one": "{count} code block",
+      "other": "{count} code blocks"
+    },
+    "images": {
+      "one": "{count} image",
+      "other": "{count} images"
+    },
+    "links": {
+      "one": "{count} link",
+      "other": "{count} links"
+    },
+    "time": "Time",
+    "readingTime": "Reading time",
+    "speakingTime": "Speaking time",
+    "minutes": {
+      "one": "about {count} min",
+      "other": "about {count} min"
+    },
+    "underMinute": "under 1 min",
+    "timeHint": "At {read} words a minute for reading and {speak} for speaking aloud.",
+    "readability": "Readability",
+    "ease": "Reading ease",
+    "grade": "Grade level",
+    "gradeValue": "US school grade {count}",
+    "averageSentence": "Average sentence",
+    "wordsN": {
+      "one": "{count} word",
+      "other": "{count} words"
+    },
+    "longSentences": "Sentences over {count} words",
+    "longest": "Longest sentence",
+    "readabilityHint": "Flesch scores: reading ease runs from 0 (very hard) to 100 (very easy), and 60–70 is plain English. Code is left out.",
+    "readabilityUnavailable": "Readability scores need at least a few sentences of English text.",
+    "levelVeryEasy": "very easy",
+    "levelEasy": "easy",
+    "levelFairlyEasy": "fairly easy",
+    "levelPlain": "plain English",
+    "levelFairlyDifficult": "fairly difficult",
+    "levelDifficult": "difficult",
+    "levelVeryDifficult": "very difficult",
+    "repeated": "Most used words",
+    "repeatedNone": "No word is used three times or more.",
+    "repeatedHint": "Common words such as “which” and “would” are left out.",
+    "tokens": "AI tokens",
+    "tokensExplain": "AI models such as Claude and ChatGPT read text in tokens, pieces of about four characters of English. This estimates how much of a model's context (what it can take in at once) this file uses when you paste or attach it. It counts the file as written, markdown symbols included; code and Chinese, Japanese or Korean text take more tokens. Exact counts vary by model.",
+    "close": "Close"
   },
   "tabbar": {
     "unsaved": "Unsaved changes",
@@ -225,7 +295,9 @@
     "pageSizeHint": "Paper size for templates and PDF export, unless a document sets {code}.",
     "pageSizeLetter": "US Letter",
     "pageSizeA4": "A4",
-    "templatesHint": "Your own templates live in the templates folder, one folder each holding template.css and template.json. Duplicate a template to start from it; changes show up as soon as you save the file."
+    "templatesHint": "Your own templates live in the templates folder, one folder each holding template.css and template.json. Duplicate a template to start from it; changes show up as soon as you save the file.",
+    "highlightChanges": "Highlight what changed",
+    "highlightChangesHint": "When an open file changes on disk, mark the paragraphs that changed until you clear them from the status bar."
   },
   "templates": {
     "none": "None (reader view)",

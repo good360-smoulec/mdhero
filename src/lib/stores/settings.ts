@@ -32,6 +32,8 @@ export interface ReaderSettings {
   pageSize: PageSize;
   /** Show a templated document as separate pages instead of one long sheet. */
   pagedView: boolean;
+  /** Mark the blocks a reload from disk changed, until dismissed or the next reload. */
+  highlightChanges: boolean;
 }
 
 const STORAGE_KEY = "mdhero-settings";
@@ -106,6 +108,7 @@ function loadSettings(): ReaderSettings {
     defaultTemplate: "none",
     pageSize: "letter",
     pagedView: false,
+    highlightChanges: true,
   };
 
   if (typeof localStorage === "undefined") return defaults;
@@ -132,6 +135,7 @@ function loadSettings(): ReaderSettings {
         defaultTemplate: typeof parsed.defaultTemplate === "string" ? parsed.defaultTemplate : defaults.defaultTemplate,
         pageSize: parsed.pageSize === "a4" ? "a4" : "letter",
         pagedView: storedBoolean(parsed.pagedView, defaults.pagedView),
+        highlightChanges: storedBoolean(parsed.highlightChanges, defaults.highlightChanges),
       };
     }
   } catch {}
