@@ -321,7 +321,14 @@
   },
   "toc": {
     "onThisPage": "On this page",
-    "resize": "Resize table of contents"
+    "resize": "Resize table of contents",
+    "levelsLabel": "Show headings down to a level",
+    "showToLevel": "Show headings down to level {count}",
+    "expandAll": "Expand all sections"
+  },
+  "sections": {
+    "collapse": "Collapse section",
+    "expand": "Expand section"
   },
   "dropzone": {
     "drop": "Drop to open"

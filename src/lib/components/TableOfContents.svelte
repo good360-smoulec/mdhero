@@ -11,6 +11,33 @@
   import { chromeTop, sideTabsWidth } from "$lib/utils/layout";
   import PanelResizer from "./PanelResizer.svelte";
   import { t } from "$lib/i18n";
+  import { document as docStore } from "$lib/stores/document";
+  import { collapsedSections, revealElement, sectionsActive, setCollapsedSections, toggleSection } from "$lib/stores/sections";
+  import { collapseToLevel, hiddenItems } from "$lib/utils/sections";
+
+  // The outline mirrors the document: entries inside a collapsed section are
+  // hidden, and the level buttons show headings down to a level.
+  let path = $derived($docStore.filePath);
+  let collapsed = $derived(new Set(path ? $collapsedSections[path] ?? [] : []));
+  let canCollapse = $derived($sectionsActive && !!path);
+  let hidden = $derived(canCollapse ? hiddenItems($tocEntries, collapsed) : $tocEntries.map(() => false));
+  let levels = $derived(
+    Array.from({ length: Math.min(4, Math.max(0, ...$tocEntries.map((e) => e.level))) }, (_, i) => i + 1),
+  );
+  let currentLevel = $derived(
+    levels.find((level) => {
+      const ids = collapseToLevel($tocEntries, level);
+      return ids.length === collapsed.size && ids.every((id) => collapsed.has(id));
+    }) ?? null,
+  );
+
+  function showToLevel(level: number) {
+    if (path) setCollapsedSections(path, collapseToLevel($tocEntries, level));
+  }
+
+  function expandAll() {
+    if (path) setCollapsedSections(path, []);
+  }
 
   /** The width the ToC shares with the document: the window, less the side
    *  tabs panel when there is one. */
@@ -21,6 +48,7 @@
   function scrollToHeading(id: string) {
     setActiveHeading(id);
     const el = document.getElementById(id);
+    revealElement(el);
     if (el) {
       const offset = chromeTop() - 5;
       const y = el.getBoundingClientRect().top + window.scrollY - offset;
@@ -37,17 +65,60 @@
   <aside class="toc-sidebar">
     <div class="toc-header">
       <span>{$t('toc.onThisPage')}</span>
+      {#if canCollapse && levels.length > 0}
+        <div class="toc-levels" role="group" aria-label={$t('toc.levelsLabel')}>
+          {#each levels as level (level)}
+            <button
+              class="level-btn"
+              class:current={currentLevel === level}
+              onclick={() => showToLevel(level)}
+              title={$t('toc.showToLevel', { count: level })}
+              aria-label={$t('toc.showToLevel', { count: level })}
+            >{level}</button>
+          {/each}
+          <button
+            class="level-btn"
+            class:current={collapsed.size === 0}
+            onclick={expandAll}
+            title={$t('toc.expandAll')}
+            aria-label={$t('toc.expandAll')}
+          >
+            <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4,3 8,7 12,3" /><polyline points="4,9 8,13 12,9" />
+            </svg>
+          </button>
+        </div>
+      {/if}
     </div>
     <nav class="toc-nav">
-      {#each $tocEntries as entry (entry.id)}
-        <button
-          onclick={() => scrollToHeading(entry.id)}
-          class="toc-item"
-          class:active={$activeHeadingId === entry.id}
-          style="padding-left: calc(12px + {getIndent(entry.level)})"
-        >
-          {entry.text}
-        </button>
+      {#each $tocEntries as entry, i (entry.id)}
+        {#if !hidden[i]}
+          <div class="toc-row">
+            {#if canCollapse}
+              <button
+                class="toc-chevron"
+                class:collapsed={collapsed.has(entry.id)}
+                style="left: {getIndent(entry.level)}"
+                onclick={() => path && toggleSection(path, entry.id)}
+                aria-expanded={!collapsed.has(entry.id)}
+                aria-label={collapsed.has(entry.id) ? $t('sections.expand') : $t('sections.collapse')}
+                title={collapsed.has(entry.id) ? $t('sections.expand') : $t('sections.collapse')}
+              >
+                <svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="4,6 8,10 12,6" />
+                </svg>
+              </button>
+            {/if}
+            <button
+              onclick={() => scrollToHeading(entry.id)}
+              class="toc-item"
+              class:active={$activeHeadingId === entry.id}
+              style="padding-left: calc({canCollapse ? 22 : 12}px + {getIndent(entry.level)})"
+            >
+              {entry.text}
+            </button>
+          </div>
+        {/if}
       {/each}
     </nav>
   </aside>
@@ -153,6 +224,93 @@
     color: #22D3EE;
     border-left-color: #22D3EE;
     background: rgba(34, 211, 238, 0.08);
+  }
+
+  .toc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .toc-levels {
+    display: inline-flex;
+    gap: 2px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .level-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #8e8e93;
+    border-radius: 4px;
+  }
+
+  .level-btn:hover {
+    color: #1c1c1e;
+    background: rgba(127, 127, 127, 0.14);
+  }
+
+  .level-btn.current {
+    color: #0891b2;
+    background: rgba(8, 145, 178, 0.1);
+  }
+
+  :global(html.dark) .level-btn:hover {
+    color: #e5e5e7;
+  }
+
+  :global(html.dark) .level-btn.current {
+    color: #22d3ee;
+    background: rgba(34, 211, 238, 0.1);
+  }
+
+  .toc-row {
+    position: relative;
+  }
+
+  .toc-chevron {
+    position: absolute;
+    top: 50%;
+    margin-left: 6px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    color: #aeaeb2;
+    border-radius: 4px;
+    z-index: 1;
+  }
+
+  .toc-chevron:hover {
+    color: #1c1c1e;
+    background: rgba(127, 127, 127, 0.14);
+  }
+
+  :global(html.dark) .toc-chevron:hover {
+    color: #e5e5e7;
+  }
+
+  .toc-chevron svg {
+    transition: transform 0.15s;
+  }
+
+  .toc-chevron.collapsed {
+    color: #0891b2;
+  }
+
+  .toc-chevron.collapsed svg {
+    transform: rotate(-90deg);
   }
 
   @media print {

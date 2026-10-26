@@ -9,6 +9,10 @@ export async function copyAsRichText(html: string, _markdown: string): Promise<b
     // Create a temporary container with the rendered HTML
     const container = document.createElement("div");
     container.innerHTML = html;
+    // The page's own controls (code Copy buttons, section toggles) aren't
+    // content; a collapsed section is, so it's copied whole.
+    container.querySelectorAll(".code-copy-btn, .section-toggle").forEach((el) => el.remove());
+    container.querySelectorAll(".md-section-hidden").forEach((el) => el.classList.remove("md-section-hidden"));
     container.style.position = "fixed";
     container.style.left = "-9999px";
     container.style.top = "0";

@@ -2,6 +2,7 @@
   import { onMount, tick } from "svelte";
   import { document as docStore } from "$lib/stores/document";
   import { docChanges } from "$lib/stores/docChanges";
+  import { collapsedSections, toggleSection } from "$lib/stores/sections";
   import { tabStore, HOME_TAB_ID, type Tab } from "$lib/stores/tabs";
   import { initRenderer, renderFull, resolveLocalPath, isMarpDoc } from "$lib/renderer/pipeline";
   import {
@@ -1382,6 +1383,8 @@
           paged={$settings.pagedView || printPaging}
           onPagesChange={handlePagesChange}
           changes={$settings.highlightChanges && $docStore.filePath ? $docChanges[$docStore.filePath] ?? null : null}
+          collapsed={$docStore.filePath ? $collapsedSections[$docStore.filePath] ?? [] : null}
+          onToggleSection={(id) => $docStore.filePath && toggleSection($docStore.filePath, id)}
         />
       </main>
     {/if}

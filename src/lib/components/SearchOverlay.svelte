@@ -8,6 +8,7 @@
   } from "$lib/stores/search";
   import { cycleIndex } from "$lib/utils/text-search";
   import { t } from "$lib/i18n";
+  import { revealElement } from "$lib/stores/sections";
 
   let { visible = $bindable(false) }: { visible: boolean } = $props();
 
@@ -69,6 +70,7 @@
     const target = marks[index];
     if (target) {
       target.classList.add("mdv-search-active");
+      revealElement(target);
       target.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   }

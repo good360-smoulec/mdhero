@@ -321,7 +321,14 @@
   },
   "toc": {
     "onThisPage": "En esta página",
-    "resize": "Cambiar el ancho del índice"
+    "resize": "Cambiar el ancho del índice",
+    "levelsLabel": "Mostrar encabezados hasta un nivel",
+    "showToLevel": "Mostrar encabezados hasta el nivel {count}",
+    "expandAll": "Expandir todas las secciones"
+  },
+  "sections": {
+    "collapse": "Contraer sección",
+    "expand": "Expandir sección"
   },
   "dropzone": {
     "drop": "Suelta para abrir"

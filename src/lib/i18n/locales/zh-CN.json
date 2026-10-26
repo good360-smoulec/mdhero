@@ -313,7 +313,14 @@
   },
   "toc": {
     "onThisPage": "本页目录",
-    "resize": "调整目录宽度"
+    "resize": "调整目录宽度",
+    "levelsLabel": "显示到某一级标题",
+    "showToLevel": "显示到 {count} 级标题",
+    "expandAll": "展开所有章节"
+  },
+  "sections": {
+    "collapse": "折叠此节",
+    "expand": "展开此节"
   },
   "dropzone": {
     "drop": "拖放以打开"

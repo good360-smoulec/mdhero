@@ -321,7 +321,14 @@
   },
   "toc": {
     "onThisPage": "Sur cette page",
-    "resize": "Redimensionner le sommaire"
+    "resize": "Redimensionner le sommaire",
+    "levelsLabel": "Afficher les titres jusqu'à un niveau",
+    "showToLevel": "Afficher les titres jusqu'au niveau {count}",
+    "expandAll": "Déplier toutes les sections"
+  },
+  "sections": {
+    "collapse": "Replier la section",
+    "expand": "Déplier la section"
   },
   "dropzone": {
     "drop": "Déposez pour ouvrir"
