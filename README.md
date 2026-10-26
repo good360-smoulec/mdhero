@@ -20,6 +20,32 @@ A beautiful, native Markdown viewer and lightweight editor for macOS, Windows an
 
 </div>
 
+> [!NOTE]
+> **This is a Windows-focused fork of [MDHero](https://github.com/vaibhav-kakde-in/mdhero).**
+> MDHero is created and maintained by [Vaibhav Kakde](https://github.com/vaibhav-kakde-in). All credit for the app goes to them and to the upstream contributors; this fork only adds to their work. For the official app, releases, website and support, use the [upstream project](https://github.com/vaibhav-kakde-in/mdhero).
+
+## About this fork
+
+**Windows first.** This fork is developed, built and tested on Windows. The macOS and Linux code from upstream is kept as it is, but it isn't tested here — for those platforms, use the [upstream releases](https://github.com/vaibhav-kakde-in/mdhero/releases/latest).
+
+**What this fork adds:**
+
+| Change | Status |
+|---|---|
+| **Document templates** — Report, Letter and Memo layouts for the preview and PDF export, chosen with `template:` in frontmatter, from the toolbar, or in Settings; user templates with imported CSS treated as untrusted | Proposed upstream in [#191](https://github.com/vaibhav-kakde-in/mdhero/pull/191) |
+| **pnpm 11+ support** — the DOMPurify version pin moved to `pnpm-workspace.yaml`, since newer pnpm no longer reads it from `package.json` | Proposed upstream in [#191](https://github.com/vaibhav-kakde-in/mdhero/pull/191) |
+| **Renderer cleanup and LF line endings** — one shared markdown-it setup, and `.gitattributes` so the test suite passes on Windows checkouts | Proposed upstream in [#191](https://github.com/vaibhav-kakde-in/mdhero/pull/191) |
+
+The aim is to send everything back upstream. This fork's `main` branch is kept identical to upstream; the fork's own changes live on the `windows` branch (the default branch here).
+
+**Installing this fork:** there are no prebuilt releases yet. Build it on Windows with `pnpm install` then `pnpm tauri build`; the installer is written to `src-tauri\target\release\bundle\nsis\`. The installer isn't code-signed, so Windows SmartScreen may ask you to confirm. The app's update check looks at upstream's releases, so installing an update it offers replaces this build with the official version.
+
+**Issues:** problems that also happen in the official app belong in [upstream's issues](https://github.com/vaibhav-kakde-in/mdhero/issues). Please don't report problems with this fork's own features there; comment on the pull request linked above instead.
+
+The rest of this README is upstream's, unchanged.
+
+---
+
 <table>
 <tr>
 <td><img src=".github/assets/hero-light.png" alt="MDHero Light Mode"></td>
