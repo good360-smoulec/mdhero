@@ -163,6 +163,8 @@
     "showTabsTop": "Afficher les onglets en haut",
     "showTabsSideTitle": "Afficher les onglets sur le côté",
     "showTabsTopTitle": "Afficher les onglets en haut",
+    "collapseTabs": "Masquer le panneau des onglets",
+    "expandTabs": "Afficher le panneau des onglets",
     "resize": "Redimensionner le panneau des onglets"
   },
   "empty": {

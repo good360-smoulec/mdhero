@@ -7,7 +7,7 @@ import {
   MAX_TABS_WIDTH,
   MIN_DOCUMENT_WIDTH,
 } from "../../src/lib/stores/settings";
-import { sideTabsWidth } from "../../src/lib/utils/layout";
+import { COLLAPSED_TABS_WIDTH, sideTabsWidth } from "../../src/lib/utils/layout";
 import { tabFolderLabel, tabsNeedingFolder } from "../../src/lib/utils/path";
 import { setLocale, translate } from "../../src/lib/i18n";
 
@@ -44,8 +44,13 @@ describe("clampTabsWidth", () => {
 
 describe("sideTabsWidth", () => {
   it("is the panel width with tabs on the side, and nothing with tabs on top", () => {
-    expect(sideTabsWidth({ tabsPosition: "side", tabsWidth: 250 })).toBe(250);
-    expect(sideTabsWidth({ tabsPosition: "top", tabsWidth: 250 })).toBe(0);
+    expect(sideTabsWidth({ tabsPosition: "side", tabsWidth: 250, tabsCollapsed: false })).toBe(250);
+    expect(sideTabsWidth({ tabsPosition: "top", tabsWidth: 250, tabsCollapsed: false })).toBe(0);
+  });
+
+  it("is the narrow strip when the panel is collapsed, keeping the width for when it opens", () => {
+    expect(sideTabsWidth({ tabsPosition: "side", tabsWidth: 250, tabsCollapsed: true })).toBe(COLLAPSED_TABS_WIDTH);
+    expect(sideTabsWidth({ tabsPosition: "top", tabsWidth: 250, tabsCollapsed: true })).toBe(0);
   });
 });
 

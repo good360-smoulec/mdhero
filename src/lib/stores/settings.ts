@@ -27,6 +27,8 @@ export interface ReaderSettings {
   tabsPosition: "top" | "side";
   /** Width of the side tabs panel in px. */
   tabsWidth: number;
+  /** Side tabs panel folded down to a narrow strip. */
+  tabsCollapsed: boolean;
   /** Template id for documents that don't name one, or "none" for the reader view. */
   defaultTemplate: string;
   /** Paper size for templates and print, unless a document sets `papersize`. */
@@ -108,6 +110,7 @@ function loadSettings(): ReaderSettings {
     autoCheckUpdates: true,
     tabsPosition: "top",
     tabsWidth: DEFAULT_TABS_WIDTH,
+    tabsCollapsed: false,
     defaultTemplate: "none",
     pageSize: "letter",
     pagedView: false,
@@ -136,6 +139,7 @@ function loadSettings(): ReaderSettings {
         autoCheckUpdates: storedBoolean(parsed.autoCheckUpdates, defaults.autoCheckUpdates),
         tabsPosition: parsed.tabsPosition === "side" ? "side" : "top",
         tabsWidth: clampTabsWidth(parsed.tabsWidth),
+        tabsCollapsed: storedBoolean(parsed.tabsCollapsed, defaults.tabsCollapsed),
         defaultTemplate: typeof parsed.defaultTemplate === "string" ? parsed.defaultTemplate : defaults.defaultTemplate,
         pageSize: parsed.pageSize === "a4" ? "a4" : "letter",
         pagedView: storedBoolean(parsed.pagedView, defaults.pagedView),

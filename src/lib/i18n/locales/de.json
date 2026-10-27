@@ -163,6 +163,8 @@
     "showTabsTop": "Tabs oben anzeigen",
     "showTabsSideTitle": "Tabs seitlich anzeigen",
     "showTabsTopTitle": "Tabs oben anzeigen",
+    "collapseTabs": "Tab-Leiste ausblenden",
+    "expandTabs": "Tab-Leiste einblenden",
     "resize": "Breite des Tab-Bereichs ändern"
   },
   "empty": {

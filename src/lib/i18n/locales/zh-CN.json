@@ -155,6 +155,8 @@
     "showTabsTop": "在顶部显示标签页",
     "showTabsSideTitle": "在侧边显示标签页",
     "showTabsTopTitle": "在顶部显示标签页",
+    "collapseTabs": "隐藏标签页面板",
+    "expandTabs": "显示标签页面板",
     "resize": "调整标签页面板宽度"
   },
   "empty": {

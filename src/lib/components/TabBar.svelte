@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import { get } from "svelte/store";
-  import { PanelLeft, PanelTop } from "@lucide/svelte";
+  import { PanelLeft, PanelLeftClose, PanelLeftOpen, PanelTop } from "@lucide/svelte";
   import { tabStore, HOME_TAB_ID, type Tab } from "$lib/stores/tabs";
   import {
     settings,
@@ -39,8 +39,14 @@
   // Side tabs whose folder goes under their name, to tell same-named files apart.
   let withFolder = $derived(tabsNeedingFolder($tabs));
 
+  let collapsed = $derived(side && $settings.tabsCollapsed);
+
   function toggleTabsPosition() {
     settings.update((s) => ({ ...s, tabsPosition: s.tabsPosition === "side" ? "top" : "side" }));
+  }
+
+  function setTabsCollapsed(tabsCollapsed: boolean) {
+    settings.update((s) => ({ ...s, tabsCollapsed }));
   }
 
   /** The width the side panel shares with the document: the window, less the
@@ -219,8 +225,40 @@
   {#if tab.diskChanged}<span class="tab-disk" title={$t('tabbar.diskChanged')}>⟳</span>{:else if tab.dirty}<span class="tab-dirty" title={$t('tabbar.unsaved')}>•</span>{/if}{tab.fileName}
 {/snippet}
 
-<div class="tabbar" class:side>
+<div class="tabbar" class:side class:collapsed>
+  {#if collapsed}
+    <button
+      class="layout-btn"
+      onclick={() => setTabsCollapsed(false)}
+      title={$t('tabbar.expandTabs')}
+      aria-label={$t('tabbar.expandTabs')}
+      aria-expanded="false"
+    >
+      <PanelLeftOpen size={15} />
+    </button>
+  {:else}
   <div class="tabbar-inner">
+    {#if side}
+      <div class="side-header">
+        <button
+          class="layout-btn"
+          onclick={() => setTabsCollapsed(true)}
+          title={$t('tabbar.collapseTabs')}
+          aria-label={$t('tabbar.collapseTabs')}
+          aria-expanded="true"
+        >
+          <PanelLeftClose size={14} />
+        </button>
+        <button
+          class="layout-btn"
+          onclick={toggleTabsPosition}
+          title={$t('tabbar.showTabsTopTitle')}
+          aria-label={$t('tabbar.showTabsTopTitle')}
+        >
+          <PanelTop size={14} />
+        </button>
+      </div>
+    {/if}
     <!-- Home tab -->
     <div
       class="tab home-tab"
@@ -280,17 +318,20 @@
       </svg>
       {#if side}<span>{$t('tabbar.newTab')}</span>{/if}
     </button>
-    <button
-      class="layout-btn"
-      onclick={toggleTabsPosition}
-      title={side ? $t('tabbar.showTabsTopTitle') : $t('tabbar.showTabsSideTitle')}
-      aria-label={side ? $t('tabbar.showTabsTopTitle') : $t('tabbar.showTabsSideTitle')}
-    >
-      {#if side}<PanelTop size={14} />{:else}<PanelLeft size={14} />{/if}
-    </button>
+    {#if !side}
+      <button
+        class="layout-btn"
+        onclick={toggleTabsPosition}
+        title={$t('tabbar.showTabsSideTitle')}
+        aria-label={$t('tabbar.showTabsSideTitle')}
+      >
+        <PanelLeft size={14} />
+      </button>
+    {/if}
   </div>
+  {/if}
 </div>
-{#if side}
+{#if side && !collapsed}
   <!-- z-index 15 like the panel itself. `--tabs-w` is owned by +page.svelte,
        which re-publishes it whenever the stored value changes. -->
   <PanelResizer
@@ -562,10 +603,23 @@
     align-items: stretch;
   }
 
+  .side-header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+
   .tabbar.side .layout-btn {
-    order: -1;
-    align-self: flex-end;
-    margin: 0 0 2px;
+    margin: 0;
+  }
+
+  /* Folded down to a strip with the button that opens it again. */
+  .tabbar.side.collapsed {
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .tabbar.side .tab {
