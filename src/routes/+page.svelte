@@ -66,6 +66,7 @@
 
   let rendererReady = $state(false);
   let searchVisible = $state(false);
+  let findOpenedAt = 0;
   let pasteVisible = $state(false);
   let pasteDefaultMode = $state<"paste" | "url">("paste");
   let openVisible = $state(false);
@@ -665,6 +666,8 @@
       themeMode.update((m) => cycleTheme(m));
     };
     (window as any).__mdhero_find = () => {
+      // The keydown fallback below may have just opened it for the same press.
+      if (Date.now() - findOpenedAt < 300) return;
       searchVisible = !searchVisible;
     };
     // File > Close Tab (Cmd/Ctrl+W). The menu item declared this accelerator
@@ -1056,6 +1059,15 @@
     if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === "p") {
       e.preventDefault();
       printDocument();
+      return;
+    }
+    // Cmd/Ctrl+F find. Same fallback: on Windows, WebView2 otherwise answers
+    // Ctrl+F with its own find bar, which can't see text in a collapsed section
+    // (or reveal it), so the app's search must get the key.
+    if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "f") {
+      e.preventDefault();
+      findOpenedAt = Date.now();
+      searchVisible = true;
       return;
     }
     if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "f") {
