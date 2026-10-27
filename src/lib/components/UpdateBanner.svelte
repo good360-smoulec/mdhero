@@ -71,15 +71,15 @@
     align-items: center;
     gap: 10px;
     padding: 9px 12px;
-    background: #ECFEFF;
-    border: 1px solid #A5F3FC;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-soft-border);
     border-radius: 10px;
-    color: #0E7490;
+    color: var(--accent-strong);
   }
   :global(html.dark) .banner {
-    background: rgba(8, 145, 178, 0.12);
-    border-color: rgba(34, 211, 238, 0.25);
-    color: #67E8F9;
+    background: rgb(var(--accent-rgb) / 0.12);
+    border-color: rgb(var(--accent-bright-rgb) / 0.25);
+    color: var(--accent-pale);
   }
 
   .banner.important {
@@ -141,12 +141,12 @@
   }
 
   .banner-btn.primary {
-    background: #0891B2;
+    background: var(--accent);
     color: white;
   }
-  .banner-btn.primary:hover { background: #0E7490; }
-  :global(html.dark) .banner-btn.primary { background: #0891B2; }
-  :global(html.dark) .banner-btn.primary:hover { background: #22D3EE; color: #0C4A6E; }
+  .banner-btn.primary:hover { background: var(--accent-strong); }
+  :global(html.dark) .banner-btn.primary { background: var(--accent); }
+  :global(html.dark) .banner-btn.primary:hover { background: var(--accent-bright); color: var(--accent-ink); }
 
   .banner-btn.link { text-decoration: underline; opacity: 0.85; }
   .banner-btn.link:hover { opacity: 1; }

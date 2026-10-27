@@ -123,8 +123,8 @@
   }
 
   .lang-option.selected {
-    border-color: #0891B2;
-    background: rgba(8, 145, 178, 0.06);
+    border-color: var(--accent);
+    background: rgb(var(--accent-rgb) / 0.06);
   }
 
   .lang-native {

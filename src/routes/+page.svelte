@@ -62,6 +62,7 @@
   import { gutterHtml, gutterWidth, lineCount } from "$lib/utils/line-gutter";
   import { createWheelZoom } from "$lib/utils/wheel-zoom";
   import { chromeTop, sideTabsWidth, SIDE_TABS_CHROME, TOP_TABS_CHROME } from "$lib/utils/layout";
+  import { accentVariables } from "$lib/utils/accent";
   import { saveProgress, getProgress } from "$lib/stores/readingProgress";
 
   let rendererReady = $state(false);
@@ -218,6 +219,13 @@
     const root = document.documentElement;
     root.style.setProperty("--tabs-w", `${width}px`);
     root.style.setProperty("--chrome-top", `${width > 0 ? SIDE_TABS_CHROME : TOP_TABS_CHROME}px`);
+  });
+
+  $effect(() => {
+    const root = document.documentElement;
+    for (const [name, value] of Object.entries(accentVariables($settings.accentColor))) {
+      root.style.setProperty(name, value);
+    }
   });
 
   // Live-render the editor content into the split preview pane, debounced so

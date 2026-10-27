@@ -243,12 +243,12 @@
   }
 
   .rc-seg-btn.active {
-    background: #0891B2;
+    background: var(--accent);
     color: white;
   }
 
   :global(html.dark) .rc-seg-btn.active {
-    background: #0891B2;
+    background: var(--accent);
     color: white;
   }
 
@@ -271,7 +271,7 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #0891B2;
+    background: var(--accent);
     cursor: pointer;
     border: 2px solid white;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);

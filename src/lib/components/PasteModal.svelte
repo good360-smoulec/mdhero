@@ -326,7 +326,7 @@
   }
 
   .llm-toggle input {
-    accent-color: #0891B2;
+    accent-color: var(--accent);
   }
 
   .modal-close {
@@ -380,7 +380,7 @@
   }
 
   .modal-textarea:focus {
-    border-color: #0891B2;
+    border-color: var(--accent);
   }
 
   .modal-textarea::placeholder {
@@ -438,7 +438,7 @@
     padding: 6px 18px;
     font-size: 12px;
     font-weight: 500;
-    background: #0891B2;
+    background: var(--accent);
     color: white;
     border: none;
     border-radius: 7px;
@@ -447,7 +447,7 @@
   }
 
   .btn-render:hover {
-    background: #0E7490;
+    background: var(--accent-strong);
   }
 
   .btn-render:disabled {
@@ -521,7 +521,7 @@
   }
 
   .url-input:focus {
-    border-color: #0891B2;
+    border-color: var(--accent);
   }
 
   .url-input::placeholder {

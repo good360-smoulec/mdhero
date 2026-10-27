@@ -1055,7 +1055,7 @@
   }
 
   article :global(.md-section-collapsed > .section-toggle) {
-    color: #0891b2;
+    color: var(--accent);
   }
 
   @media screen {

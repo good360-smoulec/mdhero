@@ -186,7 +186,7 @@
 
   .app-link {
     font-size: 12px;
-    color: #0891B2;
+    color: var(--accent);
     text-decoration: none;
     margin-top: 8px;
     transition: opacity 0.12s;

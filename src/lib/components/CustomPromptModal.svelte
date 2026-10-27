@@ -319,7 +319,7 @@
 
   .prompt-input:focus {
     outline: none;
-    border-color: #0891b2;
+    border-color: var(--accent);
   }
 
   .provider-select {
@@ -401,12 +401,12 @@
   }
 
   .btn-primary {
-    background: #0891b2;
+    background: var(--accent);
     color: white;
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: #0e7490;
+    background: var(--accent-strong);
   }
 
   .btn-primary:disabled {

@@ -402,7 +402,7 @@
     color: #1c1c1e;
     font-weight: 600;
     box-shadow: 0 -1px 3px rgba(0,0,0,0.06);
-    border-bottom: 2px solid #0891B2;
+    border-bottom: 2px solid var(--accent);
   }
 
   :global(html.dark) .tab.active {
@@ -410,15 +410,15 @@
     color: #e5e5e7;
     font-weight: 600;
     box-shadow: 0 -1px 3px rgba(0,0,0,0.2);
-    border-bottom: 2px solid #22D3EE;
+    border-bottom: 2px solid var(--accent-bright);
   }
 
   .tab.drag-over {
-    border-left: 2px solid #0891B2;
+    border-left: 2px solid var(--accent);
   }
 
   :global(html.dark) .tab.drag-over {
-    border-left-color: #22D3EE;
+    border-left-color: var(--accent-bright);
   }
 
   /* Home tab */
@@ -446,13 +446,13 @@
   }
 
   .tab-dirty {
-    color: #0891B2;
+    color: var(--accent);
     font-weight: 700;
     margin-right: 4px;
   }
 
   :global(html.dark) .tab-dirty {
-    color: #22D3EE;
+    color: var(--accent-bright);
   }
 
   .tab-close {
@@ -502,12 +502,12 @@
 
   .new-tab-btn:hover {
     background: rgba(255, 255, 255, 0.5);
-    color: #0891B2;
+    color: var(--accent);
   }
 
   :global(html.dark) .new-tab-btn:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: #22D3EE;
+    color: var(--accent-bright);
   }
 
   /* Moves the tabs between the top row and the side panel. At the far end of
@@ -531,12 +531,12 @@
 
   .layout-btn:hover {
     background: rgba(255, 255, 255, 0.5);
-    color: #0891B2;
+    color: var(--accent);
   }
 
   :global(html.dark) .layout-btn:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: #22D3EE;
+    color: var(--accent-bright);
   }
 
   /* Side tabs: a fixed panel under the toolbar, as wide as `--tabs-w`. */
@@ -583,20 +583,20 @@
   /* The accent moves from under the tab to its leading edge. */
   .tabbar.side .tab.active {
     border-bottom: none;
-    box-shadow: inset 3px 0 0 #0891B2, 0 1px 3px rgba(0,0,0,0.06);
+    box-shadow: inset 3px 0 0 var(--accent), 0 1px 3px rgba(0,0,0,0.06);
   }
 
   :global(html.dark) .tabbar.side .tab.active {
-    box-shadow: inset 3px 0 0 #22D3EE, 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: inset 3px 0 0 var(--accent-bright), 0 1px 3px rgba(0,0,0,0.2);
   }
 
   .tabbar.side .tab.drag-over {
     border-left: none;
-    border-top: 2px solid #0891B2;
+    border-top: 2px solid var(--accent);
   }
 
   :global(html.dark) .tabbar.side .tab.drag-over {
-    border-top-color: #22D3EE;
+    border-top-color: var(--accent-bright);
   }
 
   .tab-text {

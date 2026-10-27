@@ -28,6 +28,14 @@ const BOOLEANS = [
   ["highlightChanges", true],
 ] as const;
 
+describe("the stored accent color", () => {
+  it("restores a saved color and drops one that is not #rrggbb", async () => {
+    expect((await loadSettingsWith(JSON.stringify({ accentColor: "#7c3aed" }))).accentColor).toBe("#7c3aed");
+    expect((await loadSettingsWith(JSON.stringify({ accentColor: "purple" }))).accentColor).toBe("#0891b2");
+    expect((await loadSettingsWith(null)).accentColor).toBe("#0891b2");
+  });
+});
+
 describe.each(BOOLEANS)("the stored %s setting", (key, fallback) => {
   it("defaults when nothing is stored", async () => {
     expect((await loadSettingsWith(null))[key]).toBe(fallback);

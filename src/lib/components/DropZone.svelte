@@ -69,16 +69,16 @@
     align-items: center;
     gap: 8px;
     padding: 32px 48px;
-    border: 2px dashed #0891B2;
+    border: 2px dashed var(--accent);
     border-radius: 16px;
-    background: rgba(8, 145, 178, 0.06);
-    color: #0891B2;
+    background: rgb(var(--accent-rgb) / 0.06);
+    color: var(--accent);
   }
 
   :global(html.dark) .dropzone-content {
-    background: rgba(8, 145, 178, 0.12);
-    color: #22D3EE;
-    border-color: #22D3EE;
+    background: rgb(var(--accent-rgb) / 0.12);
+    color: var(--accent-bright);
+    border-color: var(--accent-bright);
   }
 
   .dropzone-text {

@@ -5,11 +5,31 @@
   import { NO_TEMPLATE, templateLabel, type PageSize } from "$lib/templates";
   import { allTemplates } from "$lib/stores/userTemplates";
   import { isMac } from "$lib/utils/platform";
+  import { ACCENT_PRESETS, normalizeAccent } from "$lib/utils/accent";
+  import type { MessageKey } from "$lib/i18n/types";
   import { t, locale, setLocale, SUPPORTED_LOCALES, type Locale } from "$lib/i18n";
   import AILookupSettings from "./AILookupSettings.svelte";
   import TemplateSettings from "./TemplateSettings.svelte";
 
   let { visible = $bindable(false) }: { visible: boolean } = $props();
+
+  const PRESET_LABELS: Record<string, MessageKey> = {
+    teal: "settings.accentTeal",
+    blue: "settings.accentBlue",
+    indigo: "settings.accentIndigo",
+    violet: "settings.accentViolet",
+    pink: "settings.accentPink",
+    red: "settings.accentRed",
+    orange: "settings.accentOrange",
+    green: "settings.accentGreen",
+    graphite: "settings.accentGraphite",
+  };
+
+  let isCustom = $derived(!ACCENT_PRESETS.some((p) => p.shades.accent === $settings.accentColor));
+
+  function setAccent(color: string) {
+    settings.update((s) => ({ ...s, accentColor: normalizeAccent(color) }));
+  }
 
   // Not in the settings store: a new launch decides whether to join this
   // window before its webview exists, so Rust owns this one (#71).
@@ -55,6 +75,44 @@
       </div>
 
       <div class="dialog-body">
+        <section class="settings-section">
+          <h3 class="section-title">{$t('settings.appearance')}</h3>
+
+          <div class="setting-row accent-row">
+            <div class="setting-text">
+              <span class="setting-label">{$t('settings.accentColor')}</span>
+              <span class="setting-hint">{$t('settings.accentColorHint')}</span>
+            </div>
+            <div class="accent-swatches" role="radiogroup" aria-label={$t('settings.accentColor')}>
+              {#each ACCENT_PRESETS as p (p.id)}
+                <button
+                  type="button"
+                  role="radio"
+                  class="accent-swatch"
+                  style="--swatch: {p.shades.accent}"
+                  aria-checked={$settings.accentColor === p.shades.accent}
+                  aria-label={$t(PRESET_LABELS[p.id])}
+                  title={$t(PRESET_LABELS[p.id])}
+                  onclick={() => setAccent(p.shades.accent)}
+                ></button>
+              {/each}
+              <label
+                class="accent-swatch accent-custom"
+                class:selected={isCustom}
+                style="--swatch: {isCustom ? $settings.accentColor : 'transparent'}"
+                title={$t('settings.accentCustom')}
+              >
+                <input
+                  type="color"
+                  value={$settings.accentColor}
+                  aria-label={$t('settings.accentCustom')}
+                  oninput={(e) => setAccent(e.currentTarget.value)}
+                />
+              </label>
+            </div>
+          </div>
+        </section>
+
         <section class="settings-section">
           <h3 class="section-title">{$t('settings.behavior')}</h3>
 
@@ -433,7 +491,7 @@
   }
 
   .setting-select:focus {
-    border-color: #0891B2;
+    border-color: var(--accent);
   }
 
   :global(html.dark) .setting-switch {
@@ -455,10 +513,71 @@
 
   .setting-switch:checked,
   :global(html.dark) .setting-switch:checked {
-    background: #0891B2;
+    background: var(--accent);
   }
 
   .setting-switch:checked::before {
     transform: translateX(16px);
+  }
+
+  .accent-row {
+    cursor: default;
+    align-items: flex-start;
+  }
+
+  .accent-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    /* Five to a row, so the nine colors and the custom one make two even rows. */
+    max-width: 130px;
+    flex-shrink: 0;
+  }
+
+  .accent-swatch {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--swatch);
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+  }
+
+  .accent-swatch[aria-checked="true"],
+  .accent-custom.selected {
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--swatch);
+  }
+
+  :global(html.dark) .accent-swatch[aria-checked="true"],
+  :global(html.dark) .accent-custom.selected {
+    box-shadow: 0 0 0 2px #2c2c2e, 0 0 0 4px var(--swatch);
+  }
+
+  .accent-swatch:focus-visible,
+  .accent-custom:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* An empty rainbow ring until a custom color is chosen, then filled with it. */
+  .accent-custom {
+    background:
+      radial-gradient(circle, var(--swatch) 55%, transparent 56%),
+      conic-gradient(#f43f5e, #f59e0b, #84cc16, #06b6d4, #6366f1, #d946ef, #f43f5e);
+  }
+
+  .accent-custom input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
   }
 </style>
