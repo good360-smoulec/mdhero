@@ -60,49 +60,69 @@ export function sectionItems(root: HTMLElement): { blocks: HTMLElement[]; items:
 const CHEVRON =
   '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4,6 8,10 12,6"/></svg>';
 
+type Labels = { collapse: string; expand: string };
+
+function drawToggle(heading: HTMLElement, id: string, collapsed: ReadonlySet<string>, labels: Labels, onToggle: (id: string) => void) {
+  let toggle = heading.querySelector<HTMLButtonElement>(":scope > .section-toggle");
+  if (!toggle) {
+    toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "section-toggle";
+    toggle.innerHTML = CHEVRON;
+    toggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onToggle(id);
+    });
+    heading.prepend(toggle);
+    heading.classList.add("md-section-heading");
+  }
+  const isCollapsed = collapsed.has(id);
+  heading.classList.toggle("md-section-collapsed", isCollapsed);
+  toggle.setAttribute("aria-expanded", String(!isCollapsed));
+  toggle.setAttribute("aria-label", isCollapsed ? labels.expand : labels.collapse);
+  toggle.title = isCollapsed ? labels.expand : labels.collapse;
+}
+
 /**
  * Put the collapse state on the page: a toggle in each top-level heading's
  * margin, and hidden blocks marked. Synchronous, so a caller about to scroll
- * to something it just revealed finds it laid out.
+ * to something it just revealed finds it laid out. Each block is numbered
+ * (data-block), so a copy laid out as pages still says which block it came from.
  */
 export function applySections(
   root: HTMLElement,
   collapsed: ReadonlySet<string>,
-  labels: { collapse: string; expand: string },
+  labels: Labels,
   onToggle: (id: string) => void,
 ): void {
   const { blocks, items } = sectionItems(root);
   const hidden = hiddenItems(items, collapsed);
   blocks.forEach((el, i) => {
+    el.dataset.block = String(i);
     el.classList.toggle("md-section-hidden", hidden[i]);
     const id = items[i].id;
-    if (items[i].level === null || !id) return;
-    let toggle = el.querySelector<HTMLButtonElement>(":scope > .section-toggle");
-    if (!toggle) {
-      toggle = document.createElement("button");
-      toggle.type = "button";
-      toggle.className = "section-toggle";
-      toggle.innerHTML = CHEVRON;
-      toggle.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onToggle(id);
-      });
-      el.prepend(toggle);
-      el.classList.add("md-section-heading");
-    }
-    const isCollapsed = collapsed.has(id);
-    el.classList.toggle("md-section-collapsed", isCollapsed);
-    toggle.setAttribute("aria-expanded", String(!isCollapsed));
-    toggle.setAttribute("aria-label", isCollapsed ? labels.expand : labels.collapse);
-    toggle.title = isCollapsed ? labels.expand : labels.collapse;
+    if (items[i].level !== null && id) drawToggle(el, id, collapsed, labels, onToggle);
   });
 }
 
-/** Take the toggles and hidden marks off, as for a copy laid out as pages. */
+/** Toggles for the headings of a copy laid out as pages, whose own toggles didn't survive the copy. */
+export function addSectionToggles(
+  root: HTMLElement,
+  collapsed: ReadonlySet<string>,
+  labels: Labels,
+  onToggle: (id: string) => void,
+): void {
+  root.querySelectorAll<HTMLElement>(".md-section-heading[id]").forEach((heading) => {
+    drawToggle(heading, heading.id, collapsed, labels, onToggle);
+  });
+}
+
+/** Take the toggles and hidden marks off. */
 export function stripSections(root: ParentNode): void {
   root.querySelectorAll(".section-toggle").forEach((el) => el.remove());
-  root.querySelectorAll(".md-section-hidden, .md-section-collapsed, .md-section-heading").forEach((el) => {
+  root.querySelectorAll<HTMLElement>(".md-section-hidden, .md-section-collapsed, .md-section-heading, [data-block]").forEach((el) => {
     el.classList.remove("md-section-hidden", "md-section-collapsed", "md-section-heading");
+    delete el.dataset.block;
   });
 }

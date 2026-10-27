@@ -573,6 +573,9 @@
   // template's page numbers and running headers and matches the page view. With
   // page view off, the pages are made just for the print and dropped after.
   let printPaging = $state(false);
+  // One empty list, so the renderer doesn't see a new one (and lay pages out
+  // again) every time the document store changes.
+  const NONE_COLLAPSED: string[] = [];
   let pagesReady = false;
   let pagesWaiter: (() => void) | null = null;
   function handlePagesChange(ready: boolean) {
@@ -597,7 +600,10 @@
     try {
       // Only the rendered view lays out pages; raw source and slides print as they are.
       if (activeTemplate && !rawMode && !(presenting && activeIsMarp)) {
-        if (!$settings.pagedView) {
+        // Collapsed sections print, as they do from the reader view, so pages
+        // with some left out are laid out again whole.
+        const someCollapsed = !!$docStore.filePath && ($collapsedSections[$docStore.filePath]?.length ?? 0) > 0;
+        if (!$settings.pagedView || someCollapsed) {
           pagesReady = false;
           printPaging = true;
         }
@@ -1395,7 +1401,7 @@
           paged={$settings.pagedView || printPaging}
           onPagesChange={handlePagesChange}
           changes={$settings.highlightChanges && $docStore.filePath ? $docChanges[$docStore.filePath] ?? null : null}
-          collapsed={$docStore.filePath ? $collapsedSections[$docStore.filePath] ?? [] : null}
+          collapsed={printPaging || !$docStore.filePath ? null : $collapsedSections[$docStore.filePath] ?? NONE_COLLAPSED}
           onToggleSection={(id) => $docStore.filePath && toggleSection($docStore.filePath, id)}
         />
       </main>

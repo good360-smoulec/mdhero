@@ -49,7 +49,9 @@
     setActiveHeading(id);
     const el = document.getElementById(id);
     revealElement(el);
-    if (el) {
+    // In page view a revealed heading appears only once the pages are laid
+    // out again, and the renderer scrolls to it then.
+    if (el && el.getClientRects().length > 0) {
       const offset = chromeTop() - 5;
       const y = el.getBoundingClientRect().top + window.scrollY - offset;
       window.scrollTo({ top: y, behavior: "smooth" });

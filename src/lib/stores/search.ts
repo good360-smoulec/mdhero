@@ -16,6 +16,12 @@ export const searchActiveIndex = writable(0);
 /** Total number of matches in the active target (viewer, raw, or editor). */
 export const searchTotal = writable(0);
 
+/**
+ * Bumped when page view lays its pages out again, which replaces the marked
+ * text, so the overlay marks it afresh and keeps its place.
+ */
+export const pagesLaidOut = writable(0);
+
 /** Clear all find state — called whenever the overlay is hidden. */
 export function resetSearch(): void {
   searchQuery.set("");
