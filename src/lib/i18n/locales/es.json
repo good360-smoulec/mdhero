@@ -163,6 +163,8 @@
     "showTabsTop": "Mostrar pestañas arriba",
     "showTabsSideTitle": "Mostrar pestañas al lado",
     "showTabsTopTitle": "Mostrar pestañas arriba",
+    "collapseTabs": "Ocultar el panel de pestañas",
+    "expandTabs": "Mostrar el panel de pestañas",
     "resize": "Cambiar el ancho del panel de pestañas"
   },
   "empty": {

@@ -16,9 +16,13 @@ export const SIDE_TABS_CHROME = 44;
  *  toolbar, then the 44px tab row, which sticks right under it. */
 export const TOP_TABS_CHROME = 88;
 
+/** Width of the side tabs panel folded down to the button that opens it again. */
+export const COLLAPSED_TABS_WIDTH = 40;
+
 /** Width of the side tabs panel for these settings, 0 when tabs are on top. */
-export function sideTabsWidth(s: Pick<ReaderSettings, "tabsPosition" | "tabsWidth">): number {
-  return s.tabsPosition === "side" ? s.tabsWidth : 0;
+export function sideTabsWidth(s: Pick<ReaderSettings, "tabsPosition" | "tabsWidth" | "tabsCollapsed">): number {
+  if (s.tabsPosition !== "side") return 0;
+  return s.tabsCollapsed ? COLLAPSED_TABS_WIDTH : s.tabsWidth;
 }
 
 /** Height of the chrome above the document, as currently published. */

@@ -163,6 +163,8 @@
     "showTabsTop": "Show Tabs at the Top",
     "showTabsSideTitle": "Show tabs on the side",
     "showTabsTopTitle": "Show tabs at the top",
+    "collapseTabs": "Hide the tabs panel",
+    "expandTabs": "Show the tabs panel",
     "resize": "Resize tabs panel"
   },
   "empty": {
