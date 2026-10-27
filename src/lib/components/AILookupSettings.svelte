@@ -686,7 +686,7 @@
   .text-input:focus,
   .textarea-input:focus {
     outline: none;
-    border-color: #0891b2;
+    border-color: var(--accent);
   }
 
   .form-error {
@@ -722,20 +722,20 @@
   }
 
   .form-btn-primary {
-    background: #0891b2;
-    border-color: #0891b2;
+    background: var(--accent);
+    border-color: var(--accent);
     color: white;
   }
 
   :global(html.dark) .form-btn-primary {
-    background: #0891b2;
-    border-color: #0891b2;
+    background: var(--accent);
+    border-color: var(--accent);
     color: white;
   }
 
   .form-btn-primary:hover {
-    background: #0e7490;
-    border-color: #0e7490;
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
   }
 
   /* --- Default-provider row + reset ------------------------------------ */
@@ -798,7 +798,7 @@
 
   .default-select:focus {
     outline: none;
-    border-color: #0891b2;
+    border-color: var(--accent);
   }
 
   .select-chevron {

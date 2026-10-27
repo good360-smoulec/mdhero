@@ -24,14 +24,14 @@
     top: 0;
     left: 0;
     height: 3px;
-    background: #0891B2;
+    background: var(--accent);
     z-index: 100;
     transition: width 0.1s linear;
     pointer-events: none;
   }
 
   :global(html.dark) .progress-bar {
-    background: #22D3EE;
+    background: var(--accent-bright);
   }
 
   @media print {

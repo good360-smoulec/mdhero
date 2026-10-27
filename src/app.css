@@ -20,6 +20,19 @@
   --md-font-size: 17px;
   --md-line-height: 1.7;
 
+  /* The interface accent; the app replaces these from the Accent color
+     setting (src/lib/utils/accent.ts). */
+  --accent: #0891b2;
+  --accent-strong: #0e7490;
+  --accent-bright: #22d3ee;
+  --accent-pale: #67e8f9;
+  --accent-soft: #ecfeff;
+  --accent-soft-border: #a5f3fc;
+  --accent-deep: #0a1e2e;
+  --accent-ink: #0c4a6e;
+  --accent-rgb: 8 145 178;
+  --accent-bright-rgb: 34 211 238;
+
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;

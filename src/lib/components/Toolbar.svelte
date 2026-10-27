@@ -537,13 +537,13 @@
 
   .btn-primary {
     padding: 5px 14px;
-    background: #0891B2;
+    background: var(--accent);
     color: white;
     border-radius: 0;
   }
 
   .btn-primary:hover {
-    background: #0E7490;
+    background: var(--accent-strong);
   }
 
   .btn-ghost {
@@ -607,12 +607,12 @@
 
   .btn-icon.active {
     background: #E5F5F8;
-    color: #0891B2;
+    color: var(--accent);
   }
 
   :global(html.dark) .btn-icon.active {
-    background: #0A1E2E;
-    color: #22D3EE;
+    background: var(--accent-deep);
+    color: var(--accent-bright);
   }
 
   .current-heading {
@@ -672,13 +672,13 @@
 
   .mode-seg.active {
     background: #ffffff;
-    color: #0891b2;
+    color: var(--accent);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 
   :global(html.dark) .mode-seg.active {
     background: #48484a;
-    color: #22d3ee;
+    color: var(--accent-bright);
   }
 
   .mode-seg:disabled {
@@ -753,11 +753,11 @@
   }
 
   .save-btn.dirty {
-    color: #0891B2;
+    color: var(--accent);
   }
 
   :global(html.dark) .save-btn.dirty {
-    color: #22D3EE;
+    color: var(--accent-bright);
   }
 
   .dirty-dot {
@@ -767,11 +767,11 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #0891B2;
+    background: var(--accent);
   }
 
   :global(html.dark) .dirty-dot {
-    background: #22D3EE;
+    background: var(--accent-bright);
   }
 
   @media print {

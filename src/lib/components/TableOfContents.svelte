@@ -214,18 +214,18 @@
   }
 
   .toc-item.active {
-    color: #0891B2;
-    border-left-color: #0891B2;
+    color: var(--accent);
+    border-left-color: var(--accent);
     border-left-width: 3px;
     font-weight: 500;
-    background: rgba(8, 145, 178, 0.06);
+    background: rgb(var(--accent-rgb) / 0.06);
     border-radius: 0 4px 4px 0;
   }
 
   :global(html.dark) .toc-item.active {
-    color: #22D3EE;
-    border-left-color: #22D3EE;
-    background: rgba(34, 211, 238, 0.08);
+    color: var(--accent-bright);
+    border-left-color: var(--accent-bright);
+    background: rgb(var(--accent-bright-rgb) / 0.08);
   }
 
   .toc-header {
@@ -261,8 +261,8 @@
   }
 
   .level-btn.current {
-    color: #0891b2;
-    background: rgba(8, 145, 178, 0.1);
+    color: var(--accent);
+    background: rgb(var(--accent-rgb) / 0.1);
   }
 
   :global(html.dark) .level-btn:hover {
@@ -270,8 +270,8 @@
   }
 
   :global(html.dark) .level-btn.current {
-    color: #22d3ee;
-    background: rgba(34, 211, 238, 0.1);
+    color: var(--accent-bright);
+    background: rgb(var(--accent-bright-rgb) / 0.1);
   }
 
   .toc-row {
@@ -308,7 +308,7 @@
   }
 
   .toc-chevron.collapsed {
-    color: #0891b2;
+    color: var(--accent);
   }
 
   .toc-chevron.collapsed svg {

@@ -1,5 +1,6 @@
 import { writable } from "svelte/store";
 import type { PageSize } from "$lib/templates";
+import { DEFAULT_ACCENT, normalizeAccent } from "../utils/accent";
 
 export interface ReaderSettings {
   fontSize: number;
@@ -34,6 +35,8 @@ export interface ReaderSettings {
   pagedView: boolean;
   /** Mark the blocks a reload from disk changed, until dismissed or the next reload. */
   highlightChanges: boolean;
+  /** The interface accent, as #rrggbb. */
+  accentColor: string;
 }
 
 const STORAGE_KEY = "mdhero-settings";
@@ -109,6 +112,7 @@ function loadSettings(): ReaderSettings {
     pageSize: "letter",
     pagedView: false,
     highlightChanges: true,
+    accentColor: DEFAULT_ACCENT,
   };
 
   if (typeof localStorage === "undefined") return defaults;
@@ -136,6 +140,7 @@ function loadSettings(): ReaderSettings {
         pageSize: parsed.pageSize === "a4" ? "a4" : "letter",
         pagedView: storedBoolean(parsed.pagedView, defaults.pagedView),
         highlightChanges: storedBoolean(parsed.highlightChanges, defaults.highlightChanges),
+        accentColor: normalizeAccent(parsed.accentColor),
       };
     }
   } catch {}

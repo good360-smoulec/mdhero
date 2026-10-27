@@ -256,13 +256,13 @@
   .panel-resizer:hover::after,
   .panel-resizer:focus-visible::after,
   .panel-resizer.dragging::after {
-    background: #0891B2;
+    background: var(--accent);
   }
 
   :global(html.dark) .panel-resizer:hover::after,
   :global(html.dark) .panel-resizer:focus-visible::after,
   :global(html.dark) .panel-resizer.dragging::after {
-    background: #22D3EE;
+    background: var(--accent-bright);
   }
 
   @media print {

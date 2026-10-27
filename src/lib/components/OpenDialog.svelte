@@ -494,7 +494,7 @@
   }
 
   .url-input-sm:focus {
-    border-color: #0891B2;
+    border-color: var(--accent);
   }
 
   .url-input-sm::placeholder {
@@ -506,7 +506,7 @@
     padding: 8px 14px;
     font-size: 12px;
     font-weight: 500;
-    background: #0891B2;
+    background: var(--accent);
     color: white;
     border: none;
     border-radius: 7px;
@@ -516,7 +516,7 @@
   }
 
   .url-fetch-btn:hover {
-    background: #0E7490;
+    background: var(--accent-strong);
   }
 
   .url-fetch-btn:disabled {
@@ -565,13 +565,13 @@
   }
 
   .dialog-tab.active {
-    color: #0891B2;
-    border-bottom-color: #0891B2;
+    color: var(--accent);
+    border-bottom-color: var(--accent);
   }
 
   :global(html.dark) .dialog-tab.active {
-    color: #22D3EE;
-    border-bottom-color: #22D3EE;
+    color: var(--accent-bright);
+    border-bottom-color: var(--accent-bright);
   }
 
   .tab-count {
@@ -623,13 +623,13 @@
     height: 28px;
     border-radius: 6px;
     background: #E5F5F8;
-    color: #0891B2;
+    color: var(--accent);
     flex-shrink: 0;
   }
 
   :global(html.dark) .file-icon {
-    background: #0A1E2E;
-    color: #22D3EE;
+    background: var(--accent-deep);
+    color: var(--accent-bright);
   }
 
   .plan-icon {
@@ -790,7 +790,7 @@
     margin-top: 8px;
     padding: 6px 14px;
     font-size: 12px;
-    color: #0891B2;
+    color: var(--accent);
     background: none;
     border: 1px dashed #d1d1d6;
     border-radius: 6px;
@@ -800,17 +800,17 @@
 
   .add-folder-btn:hover {
     background: #f2f2f7;
-    border-color: #0891B2;
+    border-color: var(--accent);
   }
 
   :global(html.dark) .add-folder-btn {
-    color: #22D3EE;
+    color: var(--accent-bright);
     border-color: #3a3a3c;
   }
 
   :global(html.dark) .add-folder-btn:hover {
     background: #2c2c2e;
-    border-color: #22D3EE;
+    border-color: var(--accent-bright);
   }
 
   .add-folder-inline {
@@ -829,12 +829,12 @@
   }
 
   .add-folder-inline:hover {
-    color: #0891B2;
+    color: var(--accent);
     background: #f2f2f7;
   }
 
   :global(html.dark) .add-folder-inline:hover {
-    color: #22D3EE;
+    color: var(--accent-bright);
     background: #1c1c1e;
   }
 

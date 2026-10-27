@@ -91,7 +91,7 @@
   }
 
   .update-content svg {
-    color: #0891B2;
+    color: var(--accent);
     flex-shrink: 0;
   }
 
@@ -116,12 +116,12 @@
   }
 
   .update-btn.download {
-    background: #0891B2;
+    background: var(--accent);
     color: white;
   }
 
   .update-btn.download:hover {
-    background: #0E7490;
+    background: var(--accent-strong);
   }
 
   .update-btn.dismiss {
