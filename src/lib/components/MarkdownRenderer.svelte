@@ -8,8 +8,10 @@
   import type { LineChanges } from "$lib/utils/line-diff";
   import { blocksToMark } from "$lib/utils/change-marks";
   import { markedChangeCount } from "$lib/stores/docChanges";
-  import { applySections, stripSections } from "$lib/utils/sections";
-  import { revealElement, sectionsActive, setSectionsRedraw } from "$lib/stores/sections";
+  import { addSectionToggles, applySections, sectionItems, stripSections } from "$lib/utils/sections";
+  import { revealElement, sectionsActive, setSectionsView } from "$lib/stores/sections";
+  import { pagesLaidOut } from "$lib/stores/search";
+  import { chromeTop } from "$lib/utils/layout";
   import { tocEntries, activeHeadingId, extractToc, isObserverPaused } from "$lib/stores/toc";
   import { aiLookup, setPendingSelection } from "$lib/stores/aiLookup";
   import { t, translate } from "$lib/i18n";
@@ -243,6 +245,8 @@
     template?.id;
     pageSize;
     const pages = showPages;
+    // Pages leave hidden sections out of the layout, so collapsing lays them out again.
+    if (pages) collapsed;
 
     // A re-render (e.g. opening a linked file in a new tab) replaces the
     // article, so a hover's mouseleave may never fire — clear any stuck tooltip.
@@ -253,6 +257,7 @@
     tick().then(() => {
       if (!articleEl) return;
       if (pages) {
+        drawSections();
         paginate();
         return;
       }
@@ -284,9 +289,14 @@
     });
   });
 
-  // Page view shows the pages as printed, so sections only collapse on the
-  // single sheet and in the reader view.
-  let canCollapse = $derived(collapsed !== null && !showPages);
+  // In page view the sections are drawn on the hidden source and carried into
+  // the pages, where hidden blocks stay (so search still finds their text) but
+  // take no room.
+  let canCollapse = $derived(collapsed !== null);
+
+  function sectionLabels() {
+    return { collapse: translate("sections.collapse"), expand: translate("sections.expand") };
+  }
 
   function drawSections(set: ReadonlySet<string> = new Set(collapsed ?? [])) {
     if (!articleEl) return;
@@ -294,9 +304,7 @@
       stripSections(articleEl);
       return;
     }
-    applySections(articleEl, set, { collapse: translate("sections.collapse"), expand: translate("sections.expand") }, (id) =>
-      onToggleSection(id),
-    );
+    applySections(articleEl, set, sectionLabels(), (id) => onToggleSection(id));
   }
 
   $effect(() => {
@@ -304,17 +312,46 @@
     canCollapse;
     $t;
     drawSections();
+    if (showPages && pagesEl && canCollapse) {
+      addSectionToggles(pagesEl, new Set(collapsed ?? []), sectionLabels(), (id) => onToggleSection(id));
+    }
   });
+
+  // What a reveal in page view asked to scroll to once the pages are laid out again.
+  let pendingReveal: { id: string; block: string } | null = null;
 
   $effect(() => {
     if (!canCollapse) return;
     sectionsActive.set(true);
-    setSectionsRedraw((set) => drawSections(set));
+    setSectionsView({
+      items: () => (articleEl ? sectionItems(articleEl).items : []),
+      redraw: (set, target) => {
+        drawSections(set);
+        if (!showPages) return;
+        pendingReveal = { id: target.id, block: target.closest<HTMLElement>("[data-block]")?.dataset.block ?? "" };
+      },
+    });
     return () => {
       sectionsActive.set(false);
-      setSectionsRedraw(null);
+      setSectionsView(null);
     };
   });
+
+  function scrollToPendingReveal(root: HTMLElement) {
+    const want = pendingReveal;
+    pendingReveal = null;
+    if (!want) return;
+    const el =
+      (want.id && root.querySelector<HTMLElement>(`#${CSS.escape(want.id)}`)) ||
+      (want.block && root.querySelector<HTMLElement>(`[data-block="${want.block}"]`));
+    if (!el) return;
+    if (/^H[1-6]$/.test(el.tagName)) {
+      const y = el.getBoundingClientRect().top + window.scrollY - (chromeTop() - 5);
+      window.scrollTo({ top: y, behavior: "smooth" });
+    } else {
+      el.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }
 
   // An in-page link (a footnote, a #heading) can point into a collapsed
   // section; open it before the browser scrolls there.
@@ -378,6 +415,23 @@
     });
   }
 
+  /**
+   * Put the blocks of collapsed sections back into the laid-out pages, each
+   * after the block before it, so search finds their text and a reveal can
+   * tell which section to open. They take no room, so the layout stands.
+   */
+  function restoreHiddenBlocks(root: HTMLElement, blocks: HTMLElement[]) {
+    for (const block of blocks) {
+      block.style.display = "none";
+      for (let i = Number(block.dataset.block) - 1; i >= 0; i--) {
+        const before = root.querySelectorAll(`[data-block="${i}"]`);
+        if (before.length === 0) continue;
+        before[before.length - 1].after(block);
+        break;
+      }
+    }
+  }
+
   /** Drop any pages and Paged.js's stylesheets, and cancel a layout in progress. */
   function discardPages() {
     pagedRun++;
@@ -412,8 +466,11 @@
     flow.innerHTML = articleEl.innerHTML;
     // Listeners don't survive the copy, so the markers saying they're bound
     // must not either; copy buttons don't belong on paper.
-    flow.querySelectorAll(".code-copy-btn").forEach((btn) => btn.remove());
-    stripSections(flow);
+    flow.querySelectorAll(".code-copy-btn, .section-toggle").forEach((btn) => btn.remove());
+    // Paged.js starts a new page at nearly every display:none block, so hidden
+    // sections stay out of the layout and are put back afterwards.
+    const hiddenBlocks = Array.from(flow.querySelectorAll<HTMLElement>(":scope > .md-section-hidden"));
+    hiddenBlocks.forEach((el) => el.remove());
     flow.querySelectorAll<HTMLElement>("[data-link-bound], [data-tooltip-bound], [data-lightbox-bound]").forEach((el) => {
       delete el.dataset.linkBound;
       delete el.dataset.tooltipBound;
@@ -455,6 +512,7 @@
     pagesEl.replaceChildren(...stage.childNodes);
     stage.remove();
     paginating = false;
+    restoreHiddenBlocks(pagesEl, hiddenBlocks);
 
     tocEntries.set(extractToc(pagesEl));
     setupTocObserver(pagesEl);
@@ -462,6 +520,9 @@
     addImageClickHandlers(pagesEl);
     addLinkTooltips(pagesEl);
     addLinkHandlers(pagesEl);
+    if (canCollapse) addSectionToggles(pagesEl, new Set(collapsed ?? []), sectionLabels(), (id) => onToggleSection(id));
+    scrollToPendingReveal(pagesEl);
+    pagesLaidOut.update((n) => n + 1);
     onPagesChange(true);
   }
 
@@ -584,6 +645,7 @@
     <article
       bind:this={pagesEl}
       oncontextmenu={handleContextMenu}
+      onclickcapture={revealLinkTarget}
       class="md-content paged-view"
       data-template={template.id}
       data-page-size={pageSize}

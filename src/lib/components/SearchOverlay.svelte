@@ -5,7 +5,9 @@
     searchActiveIndex,
     searchTotal,
     resetSearch,
+    pagesLaidOut,
   } from "$lib/stores/search";
+  import { get } from "svelte/store";
   import { cycleIndex } from "$lib/utils/text-search";
   import { t } from "$lib/i18n";
   import { revealElement } from "$lib/stores/sections";
@@ -32,7 +34,8 @@
     markTarget = null;
   }
 
-  function doSearch() {
+  /** `keepPlace` marks again after the pages changed, staying on the same match. */
+  function doSearch(keepPlace = false) {
     const target = getViewTarget();
     if (!target) return; // edit mode: the Editor backdrop owns highlighting
 
@@ -54,9 +57,10 @@
           separateWordSearch: false,
           className: "mdv-search-highlight",
           done: (count) => {
+            const index = keepPlace ? Math.min(get(searchActiveIndex), Math.max(count - 1, 0)) : 0;
             searchTotal.set(count);
-            searchActiveIndex.set(0);
-            if (count > 0) scrollToViewMatch(0);
+            searchActiveIndex.set(index);
+            if (count > 0) scrollToViewMatch(index);
           },
         });
       },
@@ -125,6 +129,16 @@
     if (!visible) return;
     searchActiveIndex.set(0);
     doSearch();
+  });
+
+  // Opening a collapsed section in page view lays the pages out again, and the
+  // marks go with the old ones.
+  let seenLayout = get(pagesLaidOut);
+  $effect(() => {
+    const layout = $pagesLaidOut;
+    if (layout === seenLayout) return;
+    seenLayout = layout;
+    if (visible && get(searchQuery).trim()) doSearch(true);
   });
 
   // Move the highlighted/scrolled match when the active index changes (view
