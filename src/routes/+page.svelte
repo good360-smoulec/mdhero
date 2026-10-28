@@ -1624,5 +1624,14 @@
     .raw-source {
       border: none !important;
     }
+
+    /* The side tabs panel and the ToC aren't printed, so the room kept for
+       them would only push the document right, and make the browser shrink
+       every page to fit the paper. */
+    .doc-area,
+    .content-main.toc-spaced {
+      padding-left: 0 !important;
+      transition: none !important;
+    }
   }
 </style>
