@@ -29,6 +29,8 @@
   import { invoke } from "@tauri-apps/api/core";
   import { tocVisible, tocEntries } from "$lib/stores/toc";
   import { templateOverrides } from "$lib/stores/docTemplate";
+  import { contentsOverrides } from "$lib/stores/docContents";
+  import { resolveContents } from "$lib/utils/contents";
   import { allTemplates, initUserTemplates } from "$lib/stores/userTemplates";
   import { resolveTemplate, resolvePageSize } from "$lib/templates";
   import Toolbar from "$lib/components/Toolbar.svelte";
@@ -294,6 +296,16 @@
     resolveTemplate(activeTemplateOverride, splitFrontmatter, $settings.defaultTemplate, $allTemplates)
   );
   let splitPageSize = $derived(resolvePageSize(splitFrontmatter, $settings.pageSize));
+
+  let contentsDefaults = $derived({
+    toc: $settings.tocDefault,
+    depth: $settings.tocDepth,
+    numbering: $settings.headingNumbering,
+    title: $settings.tocTitle.trim() || $t("contents.title"),
+  });
+  let activeContentsOverride = $derived($docStore.filePath ? $contentsOverrides[$docStore.filePath] : undefined);
+  let activeContents = $derived(resolveContents(activeContentsOverride, $docStore.frontmatter, contentsDefaults));
+  let splitContents = $derived(resolveContents(activeContentsOverride, splitFrontmatter, contentsDefaults));
 
   function togglePresent() {
     presenting = !presenting;
@@ -1354,6 +1366,7 @@
           onLocalLink={handleLocalLink}
           template={splitTemplate}
           pageSize={splitPageSize}
+          contents={splitContents}
         />
       </main>
     {:else if activeTab?.isEditing}
@@ -1411,6 +1424,7 @@
           changes={$settings.highlightChanges && $docStore.filePath ? $docChanges[$docStore.filePath] ?? null : null}
           collapsed={printPaging || !$docStore.filePath ? null : $collapsedSections[$docStore.filePath] ?? NONE_COLLAPSED}
           onToggleSection={(id) => $docStore.filePath && toggleSection($docStore.filePath, id)}
+          contents={activeContents}
         />
       </main>
     {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
+  import { onMount, tick, untrack } from "svelte";
   import { get } from "svelte/store";
   import { invoke } from "@tauri-apps/api/core";
   import { settings, fontFamilyMap, getContentMaxWidth, DEFAULT_FONT_SIZE } from "$lib/stores/settings";
@@ -9,6 +9,7 @@
   import { blocksToMark } from "$lib/utils/change-marks";
   import { markedChangeCount } from "$lib/stores/docChanges";
   import { addSectionToggles, applySections, sectionItems, stripSections } from "$lib/utils/sections";
+  import { applyContents, contentsKey, type ContentsOptions } from "$lib/utils/contents";
   import { revealElement, sectionsActive, setSectionsView } from "$lib/stores/sections";
   import { pagesLaidOut } from "$lib/stores/search";
   import { chromeTop } from "$lib/utils/layout";
@@ -30,6 +31,7 @@
     changes = null,
     collapsed = null,
     onToggleSection = (_id: string) => {},
+    contents = null,
   }: {
     html: string;
     /** Lay the document out as a page in this template instead of the reader view. */
@@ -44,6 +46,8 @@
     /** Collapsed heading ids; null when sections can't collapse here. */
     collapsed?: string[] | null;
     onToggleSection?: (id: string) => void;
+    /** Table of contents and heading numbers to add to the page. */
+    contents?: ContentsOptions | null;
     onImageClick?: (src: string, allImages: string[], index: number) => void;
     /**
      * Called when a link to a local file (relative or absolute path, no URL
@@ -69,6 +73,7 @@
   // document or template changes.
   let pagedFailed = $state(false);
   let showPages = $derived(!!template && paged && !pagedFailed);
+  let contentsSignature = $derived(contentsKey(contents));
   let pagedRun = 0;
   let previewer: Previewer | null = null;
   let lastMermaidTheme = "";
@@ -244,6 +249,9 @@
     html;
     template?.id;
     pageSize;
+    // A new object with the same options must not lay the pages out again.
+    contentsSignature;
+    const contentsOptions = untrack(() => contents);
     const pages = showPages;
     // Pages leave hidden sections out of the layout, so collapsing lays them out again.
     if (pages) collapsed;
@@ -256,6 +264,7 @@
 
     tick().then(() => {
       if (!articleEl) return;
+      applyContents(articleEl, contentsOptions);
       if (pages) {
         drawSections();
         paginate();
@@ -471,6 +480,7 @@
     // sections stay out of the layout and are put back afterwards.
     const hiddenBlocks = Array.from(flow.querySelectorAll<HTMLElement>(":scope > .md-section-hidden"));
     hiddenBlocks.forEach((el) => el.remove());
+    flow.querySelectorAll(":scope > .doc-toc-marker").forEach((el) => el.remove());
     flow.querySelectorAll<HTMLElement>("[data-link-bound], [data-tooltip-bound], [data-lightbox-bound]").forEach((el) => {
       delete el.dataset.linkBound;
       delete el.dataset.tooltipBound;
@@ -920,6 +930,59 @@
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  /* Table of contents (utils/contents.ts) */
+  article :global(.doc-toc-marker) {
+    display: none !important;
+  }
+
+  article:not([data-template]) :global(.doc-toc) {
+    margin: 1.5em 0 2em;
+    padding: 1em 1.25em;
+    border: 1px solid #e5e5ea;
+    border-radius: 8px;
+  }
+
+  :global(html.dark) article:not([data-template]) :global(.doc-toc) {
+    border-color: #3a3a3c;
+  }
+
+  article:not([data-template]) :global(.doc-toc-title) {
+    margin: 0 0 0.5em;
+    font-weight: 600;
+    font-size: 1.05em;
+  }
+
+  article:not([data-template]) :global(.doc-toc-list) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  article:not([data-template]) :global(.doc-toc-item) {
+    margin: 0.2em 0;
+  }
+
+  article:not([data-template]) :global(.doc-toc-level-1) { font-weight: 500; }
+  article:not([data-template]) :global(.doc-toc-level-2) { padding-left: 1.25em; }
+  article:not([data-template]) :global(.doc-toc-level-3) { padding-left: 2.5em; }
+  article:not([data-template]) :global(.doc-toc-level-4) { padding-left: 3.75em; }
+  article:not([data-template]) :global(.doc-toc-level-5) { padding-left: 5em; }
+  article:not([data-template]) :global(.doc-toc-level-6) { padding-left: 6.25em; }
+
+  article:not([data-template]) :global(.doc-toc a) {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  article:not([data-template]) :global(.doc-toc-number) {
+    color: #8e8e93;
+    font-variant-numeric: tabular-nums;
+  }
+
+  article:not([data-template]) :global(.doc-toc-leader) {
+    display: none;
   }
 
   /* Footnotes */

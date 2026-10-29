@@ -27,6 +27,7 @@ const BOOLEANS = [
   ["pagedView", false],
   ["highlightChanges", true],
   ["tabsCollapsed", false],
+  ["tocDefault", false],
 ] as const;
 
 describe("the stored accent color", () => {

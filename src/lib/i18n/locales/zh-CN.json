@@ -304,7 +304,18 @@
     "pageSizeA4": "A4",
     "templatesHint": "你的模板位于模板文件夹中，每个模板一个文件夹，包含 template.css 和 template.json。复制一个模板即可在其基础上修改；保存文件后更改会立即生效。",
     "highlightChanges": "标记更改内容",
-    "highlightChangesHint": "当打开的文件在磁盘上发生变化时，标记有更改的段落，直到你在状态栏中清除。"
+    "highlightChangesHint": "当打开的文件在磁盘上发生变化时，标记有更改的段落，直到你在状态栏中清除。",
+    "contents": "目录与编号",
+    "tocDefault": "添加目录",
+    "tocDefaultHint": "用于未作选择的文档。单独一行 {code} 可将其放在指定位置。",
+    "tocDepth": "列出的层级",
+    "tocDepthHint": "目录在标题下列出的标题层级数。文档可设置 {code}。",
+    "headingNumbering": "标题编号",
+    "headingNumberingHint": "为文档标题下的各级标题编号。文档可设置 {code}。",
+    "numberingFormat": "自定义格式",
+    "numberingFormatHint": "每级一个模式，用逗号分隔，如 1, 1.1 或 I, i, a。1、I、i、A 或 a 代表编号。",
+    "tocTitle": "目录标题",
+    "tocTitleHint": "留空则为“目录”。文档可设置 {code}。"
   },
   "templates": {
     "none": "无（阅读视图）",
@@ -336,6 +347,24 @@
   "sections": {
     "collapse": "折叠此节",
     "expand": "展开此节"
+  },
+  "contents": {
+    "title": "目录",
+    "menuTitle": "目录与编号",
+    "menuTitleNoFile": "打开文件以添加目录或编号",
+    "toc": "目录",
+    "followDocument": "跟随文档",
+    "show": "显示",
+    "hide": "隐藏",
+    "on": "开",
+    "off": "关",
+    "levels": "层级",
+    "levelsTitle": "列出 {n} 级标题",
+    "numbering": "标题编号",
+    "numberingNone": "无",
+    "numberingCustom": "自定义…",
+    "numberingInvalid": "每一级使用 1、I、i、A 或 a，用逗号分隔",
+    "numberingPreview": "预览：{preview}"
   },
   "dropzone": {
     "drop": "拖放以打开"

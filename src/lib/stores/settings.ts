@@ -1,6 +1,7 @@
 import { writable } from "svelte/store";
 import type { PageSize } from "$lib/templates";
 import { DEFAULT_ACCENT, normalizeAccent } from "../utils/accent";
+import { clampTocDepth, DEFAULT_TOC_DEPTH } from "../utils/contents";
 
 export interface ReaderSettings {
   fontSize: number;
@@ -39,6 +40,14 @@ export interface ReaderSettings {
   highlightChanges: boolean;
   /** The interface accent, as #rrggbb. */
   accentColor: string;
+  /** Add a table of contents to documents that don't say whether to. */
+  tocDefault: boolean;
+  /** Heading levels the table of contents lists, unless a document sets `toc-depth`. */
+  tocDepth: number;
+  /** Heading numbering format (see utils/contents.ts), or "" for none. */
+  headingNumbering: string;
+  /** Title above the table of contents; "" uses the translated "Contents". */
+  tocTitle: string;
 }
 
 const STORAGE_KEY = "mdhero-settings";
@@ -116,6 +125,10 @@ function loadSettings(): ReaderSettings {
     pagedView: false,
     highlightChanges: true,
     accentColor: DEFAULT_ACCENT,
+    tocDefault: false,
+    tocDepth: DEFAULT_TOC_DEPTH,
+    headingNumbering: "",
+    tocTitle: "",
   };
 
   if (typeof localStorage === "undefined") return defaults;
@@ -145,6 +158,10 @@ function loadSettings(): ReaderSettings {
         pagedView: storedBoolean(parsed.pagedView, defaults.pagedView),
         highlightChanges: storedBoolean(parsed.highlightChanges, defaults.highlightChanges),
         accentColor: normalizeAccent(parsed.accentColor),
+        tocDefault: storedBoolean(parsed.tocDefault, defaults.tocDefault),
+        tocDepth: clampTocDepth(parsed.tocDepth),
+        headingNumbering: typeof parsed.headingNumbering === "string" ? parsed.headingNumbering : defaults.headingNumbering,
+        tocTitle: typeof parsed.tocTitle === "string" ? parsed.tocTitle : defaults.tocTitle,
       };
     }
   } catch {}

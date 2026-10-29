@@ -10,6 +10,7 @@
   import { t, locale, setLocale, SUPPORTED_LOCALES, type Locale } from "$lib/i18n";
   import AILookupSettings from "./AILookupSettings.svelte";
   import TemplateSettings from "./TemplateSettings.svelte";
+  import { NUMBERING_PRESETS, MAX_TOC_DEPTH, formatNumber, parseNumbering } from "$lib/utils/contents";
 
   let { visible = $bindable(false) }: { visible: boolean } = $props();
 
@@ -60,6 +61,25 @@
       e.stopPropagation();
       visible = false;
     }
+  }
+
+  const CUSTOM_NUMBERING = "custom";
+  const isPreset = (format: string) => format === "" || (NUMBERING_PRESETS as readonly string[]).includes(format);
+  let customNumbering = $state(!isPreset($settings.headingNumbering));
+  let numberingChoice = $derived(customNumbering ? CUSTOM_NUMBERING : $settings.headingNumbering);
+  /** The first heading at each level, then the next one at the deepest, numbered as the format would. */
+  let numberingPreview = $derived.by(() => {
+    const parsed = parseNumbering($settings.headingNumbering);
+    if (!parsed) return null;
+    const counters: number[][] = parsed.map((_, i) => Array.from({ length: i + 1 }, () => 1));
+    counters.push([...counters[counters.length - 1].slice(0, -1), 2]);
+    return counters.map((c) => formatNumber(parsed, c)).filter(Boolean).join(" · ");
+  });
+
+  function chooseNumbering(value: string) {
+    customNumbering = value === CUSTOM_NUMBERING;
+    if (customNumbering) return;
+    settings.update((s) => ({ ...s, headingNumbering: value }));
   }
 </script>
 
@@ -263,6 +283,95 @@
 
           <p class="section-hint" style="margin-top: 12px;">{$t('settings.templatesHint')}</p>
           <TemplateSettings />
+        </section>
+
+        <section class="settings-section">
+          <h3 class="section-title">{$t('settings.contents')}</h3>
+
+          <label class="setting-row">
+            <div class="setting-text">
+              <span class="setting-label">{$t('settings.tocDefault')}</span>
+              <span class="setting-hint">{#each $t('settings.tocDefaultHint').split('{code}') as part, i}{#if i > 0}<code>[TOC]</code>{/if}{part}{/each}</span>
+            </div>
+            <input
+              type="checkbox"
+              checked={$settings.tocDefault}
+              onchange={(e) => settings.update((s) => ({ ...s, tocDefault: e.currentTarget.checked }))}
+              class="setting-switch"
+            />
+          </label>
+
+          <label class="setting-row">
+            <div class="setting-text">
+              <span class="setting-label">{$t('settings.tocDepth')}</span>
+              <span class="setting-hint">{#each $t('settings.tocDepthHint').split('{code}') as part, i}{#if i > 0}<code>toc-depth:</code>{/if}{part}{/each}</span>
+            </div>
+            <select
+              class="setting-select"
+              value={$settings.tocDepth}
+              onchange={(e) => settings.update((s) => ({ ...s, tocDepth: Number(e.currentTarget.value) }))}
+            >
+              {#each Array.from({ length: MAX_TOC_DEPTH }, (_, i) => i + 1) as n (n)}
+                <option value={n}>{n}</option>
+              {/each}
+            </select>
+          </label>
+
+          <label class="setting-row">
+            <div class="setting-text">
+              <span class="setting-label">{$t('settings.headingNumbering')}</span>
+              <span class="setting-hint">{#each $t('settings.headingNumberingHint').split('{code}') as part, i}{#if i > 0}<code>numbering:</code>{/if}{part}{/each}</span>
+            </div>
+            <select
+              class="setting-select"
+              value={numberingChoice}
+              onchange={(e) => chooseNumbering(e.currentTarget.value)}
+            >
+              <option value="">{$t('contents.numberingNone')}</option>
+              {#each NUMBERING_PRESETS as format (format)}
+                <option value={format}>{format}</option>
+              {/each}
+              <option value={CUSTOM_NUMBERING}>{$t('contents.numberingCustom')}</option>
+            </select>
+          </label>
+
+          {#if customNumbering}
+            <label class="setting-row">
+              <div class="setting-text">
+                <span class="setting-label">{$t('settings.numberingFormat')}</span>
+                <span class="setting-hint">
+                  {#if !$settings.headingNumbering.trim()}
+                    {$t('settings.numberingFormatHint')}
+                  {:else if numberingPreview}
+                    {$t('contents.numberingPreview', { preview: numberingPreview })}
+                  {:else}
+                    <span class="setting-error">{$t('contents.numberingInvalid')}</span>
+                  {/if}
+                </span>
+              </div>
+              <input
+                type="text"
+                class="setting-input"
+                value={$settings.headingNumbering}
+                placeholder="1., 1.a., 1.a.i."
+                oninput={(e) => settings.update((s) => ({ ...s, headingNumbering: e.currentTarget.value }))}
+              />
+            </label>
+          {/if}
+
+          <label class="setting-row">
+            <div class="setting-text">
+              <span class="setting-label">{$t('settings.tocTitle')}</span>
+              <span class="setting-hint">{#each $t('settings.tocTitleHint').split('{code}') as part, i}{#if i > 0}<code>toc-title:</code>{/if}{part}{/each}</span>
+            </div>
+            <input
+              type="text"
+              class="setting-input"
+              value={$settings.tocTitle}
+              placeholder={$t('contents.title')}
+              oninput={(e) => settings.update((s) => ({ ...s, tocTitle: e.currentTarget.value }))}
+            />
+          </label>
         </section>
 
         <section class="settings-section">
@@ -492,6 +601,36 @@
 
   .setting-select:focus {
     border-color: var(--accent);
+  }
+
+  .setting-input {
+    flex-shrink: 0;
+    width: 180px;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: #1c1c1e;
+    background: #f9f9fb;
+    border: 1px solid #e5e5ea;
+    border-radius: 7px;
+    outline: none;
+  }
+
+  :global(html.dark) .setting-input {
+    background: #1c1c1e;
+    border-color: #3a3a3c;
+    color: #e5e5e7;
+  }
+
+  .setting-input:focus {
+    border-color: var(--accent);
+  }
+
+  .setting-error {
+    color: #d70015;
+  }
+
+  :global(html.dark) .setting-error {
+    color: #ff6961;
   }
 
   :global(html.dark) .setting-switch {

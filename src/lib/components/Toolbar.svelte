@@ -10,6 +10,8 @@
   import { templateOverrides, setTemplateOverride } from "../stores/docTemplate";
   import { NO_TEMPLATE, resolveTemplate, templateLabel } from "$lib/templates";
   import { allTemplates } from "../stores/userTemplates";
+  import { contentsOverrides, setContentsOverride } from "../stores/docContents";
+  import { NUMBERING_PRESETS, resolveContents, type ContentsOverride } from "$lib/utils/contents";
   import ReaderControls from "./ReaderControls.svelte";
   import brandLogo from "$lib/assets/mdhero-icon.png";
 
@@ -60,6 +62,7 @@
   let showReaderControls = $state(false);
   let showCopyMenu = $state(false);
   let showTemplateMenu = $state(false);
+  let showContentsMenu = $state(false);
   let copyFeedback = $state("");
 
   let templateOverride = $derived($document.filePath ? $templateOverrides[$document.filePath] : undefined);
@@ -67,10 +70,39 @@
   let documentTemplate = $derived(resolveTemplate(undefined, $document.frontmatter, $settings.defaultTemplate, $allTemplates));
   let activeTemplate = $derived(resolveTemplate(templateOverride, $document.frontmatter, $settings.defaultTemplate, $allTemplates));
 
+  let contentsOverride = $derived($document.filePath ? $contentsOverrides[$document.filePath] : undefined);
+  let contentsDefaults = $derived({
+    toc: $settings.tocDefault,
+    depth: $settings.tocDepth,
+    numbering: $settings.headingNumbering,
+    title: "",
+  });
+  /** What "Follow document" lands on, as for templates. */
+  let documentContents = $derived(resolveContents(undefined, $document.frontmatter, contentsDefaults));
+  let activeContents = $derived(resolveContents(contentsOverride, $document.frontmatter, contentsDefaults));
+  let hasTocLine = $derived(/^[ \t]*\[(?:toc|\[toc\])\][ \t]*$/im.test($document.content));
+  let documentTocOn = $derived(documentContents.toc ?? (hasTocLine || $settings.tocDefault));
+  let tocOn = $derived(activeContents.toc ?? (hasTocLine || $settings.tocDefault));
+  /** The presets, plus a custom format from Settings or the document. */
+  let numberingChoices = $derived(
+    [...new Set<string>([...NUMBERING_PRESETS, $settings.headingNumbering, documentContents.numbering])].filter(Boolean),
+  );
+
   function closeAll() {
     showReaderControls = false;
     showCopyMenu = false;
     showTemplateMenu = false;
+    showContentsMenu = false;
+  }
+
+  function toggleContentsMenu() {
+    const next = !showContentsMenu;
+    closeAll();
+    showContentsMenu = next;
+  }
+
+  function chooseContents<K extends keyof ContentsOverride>(key: K, value: ContentsOverride[K] | undefined) {
+    if ($document.filePath) setContentsOverride($document.filePath, key, value);
   }
 
   function toggleTemplateMenu() {
@@ -388,6 +420,101 @@
       {/if}
     </div>
 
+    <div class="relative">
+      <button
+        onclick={toggleContentsMenu}
+        class="btn btn-icon"
+        class:active={tocOn || !!activeContents.numbering}
+        disabled={!$document.filePath}
+        title={!$document.filePath ? $t('contents.menuTitleNoFile') : $t('contents.menuTitle')}
+        aria-haspopup="menu"
+        aria-expanded={showContentsMenu}
+      >
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="6.5" y1="4" x2="13.5" y2="4"/>
+          <line x1="6.5" y1="8" x2="13.5" y2="8"/>
+          <line x1="8.5" y1="12" x2="13.5" y2="12"/>
+          <path d="M2.5 3.2l1-.7v3"/>
+          <path d="M2.5 7.3h1.5l-1.5 2h1.5"/>
+          <line x1="5" y1="12" x2="6" y2="12"/>
+        </svg>
+      </button>
+
+      {#if showContentsMenu}
+        <div class="dropdown dropdown-wide" role="menu">
+          <div class="dropdown-label">{$t('contents.toc')}</div>
+          <button
+            onclick={() => chooseContents("toc", undefined)}
+            class="dropdown-item"
+            role="menuitemradio"
+            aria-checked={contentsOverride?.toc === undefined}
+          >
+            <span><span class="dropdown-check">{contentsOverride?.toc === undefined ? "✓" : ""}</span>{$t('contents.followDocument')}</span>
+            <span class="dropdown-hint">{documentTocOn ? $t('contents.on') : $t('contents.off')}</span>
+          </button>
+          <button
+            onclick={() => chooseContents("toc", true)}
+            class="dropdown-item"
+            role="menuitemradio"
+            aria-checked={contentsOverride?.toc === true}
+          >
+            <span><span class="dropdown-check">{contentsOverride?.toc === true ? "✓" : ""}</span>{$t('contents.show')}</span>
+          </button>
+          <button
+            onclick={() => chooseContents("toc", false)}
+            class="dropdown-item"
+            role="menuitemradio"
+            aria-checked={contentsOverride?.toc === false}
+          >
+            <span><span class="dropdown-check">{contentsOverride?.toc === false ? "✓" : ""}</span>{$t('contents.hide')}</span>
+          </button>
+          <div class="dropdown-row">
+            <span class="dropdown-row-label">{$t('contents.levels')}</span>
+            {#each [1, 2, 3, 4, 5, 6] as n (n)}
+              <button
+                onclick={() => chooseContents("depth", n === documentContents.depth ? undefined : n)}
+                class="level-btn"
+                class:active={activeContents.depth === n}
+                disabled={!tocOn}
+                title={$t('contents.levelsTitle', { n })}
+                aria-pressed={activeContents.depth === n}
+              >{n}</button>
+            {/each}
+          </div>
+
+          <div class="dropdown-separator"></div>
+          <div class="dropdown-label">{$t('contents.numbering')}</div>
+          <button
+            onclick={() => chooseContents("numbering", undefined)}
+            class="dropdown-item"
+            role="menuitemradio"
+            aria-checked={contentsOverride?.numbering === undefined}
+          >
+            <span><span class="dropdown-check">{contentsOverride?.numbering === undefined ? "✓" : ""}</span>{$t('contents.followDocument')}</span>
+            <span class="dropdown-hint">{documentContents.numbering || $t('contents.numberingNone')}</span>
+          </button>
+          <button
+            onclick={() => chooseContents("numbering", "")}
+            class="dropdown-item"
+            role="menuitemradio"
+            aria-checked={contentsOverride?.numbering === ""}
+          >
+            <span><span class="dropdown-check">{contentsOverride?.numbering === "" ? "✓" : ""}</span>{$t('contents.numberingNone')}</span>
+          </button>
+          {#each numberingChoices as format (format)}
+            <button
+              onclick={() => chooseContents("numbering", format)}
+              class="dropdown-item"
+              role="menuitemradio"
+              aria-checked={contentsOverride?.numbering === format}
+            >
+              <span><span class="dropdown-check">{contentsOverride?.numbering === format ? "✓" : ""}</span>{format}</span>
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+
     <button
       onclick={togglePagedView}
       class="btn btn-icon"
@@ -444,7 +571,7 @@
   </div>
 </header>
 
-{#if showCopyMenu || showReaderControls || showTemplateMenu}
+{#if showCopyMenu || showReaderControls || showTemplateMenu || showContentsMenu}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div class="fixed inset-0 z-[9]" onclick={closeAll} onkeydown={() => {}}></div>
 {/if}
@@ -741,6 +868,80 @@
   .dropdown-check {
     display: inline-block;
     width: 1.2em;
+  }
+
+  .dropdown-wide {
+    width: 240px;
+  }
+
+  .dropdown-label {
+    padding: 6px 10px 2px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8e8e93;
+  }
+
+  .dropdown-separator {
+    height: 1px;
+    margin: 4px 6px;
+    background: #e5e5ea;
+  }
+
+  :global(html.dark) .dropdown-separator {
+    background: #3a3a3c;
+  }
+
+  .dropdown-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 10px 6px;
+    font-size: 12px;
+    color: #1c1c1e;
+  }
+
+  :global(html.dark) .dropdown-row {
+    color: #e5e5e7;
+  }
+
+  .dropdown-row-label {
+    flex: 1;
+  }
+
+  .level-btn {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    color: inherit;
+    background: none;
+    border: 1px solid #e5e5ea;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  :global(html.dark) .level-btn {
+    border-color: #3a3a3c;
+  }
+
+  .level-btn:hover:not(:disabled) {
+    background: #f2f2f7;
+  }
+
+  :global(html.dark) .level-btn:hover:not(:disabled) {
+    background: #3a3a3c;
+  }
+
+  .level-btn.active {
+    color: white;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .level-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 
   .save-btn {

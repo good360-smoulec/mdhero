@@ -312,7 +312,18 @@
     "pageSizeA4": "A4",
     "templatesHint": "Tus plantillas están en la carpeta de plantillas, una carpeta por plantilla con template.css y template.json. Duplica una plantilla para partir de ella; los cambios aparecen en cuanto guardas el archivo.",
     "highlightChanges": "Resaltar lo que cambió",
-    "highlightChangesHint": "Cuando un archivo abierto cambia en el disco, marca los párrafos modificados hasta que quites el resaltado desde la barra de estado."
+    "highlightChangesHint": "Cuando un archivo abierto cambia en el disco, marca los párrafos modificados hasta que quites el resaltado desde la barra de estado.",
+    "contents": "Índice y numeración",
+    "tocDefault": "Añadir un índice",
+    "tocDefaultHint": "Para los documentos que no lo indican. Una línea {code} lo coloca en un lugar concreto.",
+    "tocDepth": "Niveles listados",
+    "tocDepthHint": "Cuántos niveles de encabezados lista el índice, bajo el título. Un documento puede definir {code}.",
+    "headingNumbering": "Numeración de encabezados",
+    "headingNumberingHint": "Numera los encabezados bajo el título del documento. Un documento puede definir {code}.",
+    "numberingFormat": "Formato personalizado",
+    "numberingFormatHint": "Un patrón por nivel, separados por comas, como 1, 1.1 o I, i, a. Un 1, I, i, A o a representa un número.",
+    "tocTitle": "Título del índice",
+    "tocTitleHint": "Déjalo vacío para «Contenido». Un documento puede definir {code}."
   },
   "templates": {
     "none": "Ninguna (vista de lectura)",
@@ -344,6 +355,24 @@
   "sections": {
     "collapse": "Contraer sección",
     "expand": "Expandir sección"
+  },
+  "contents": {
+    "title": "Contenido",
+    "menuTitle": "Índice y numeración",
+    "menuTitleNoFile": "Abre un archivo para añadir un índice o numeración",
+    "toc": "Índice",
+    "followDocument": "Seguir el documento",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "on": "Activado",
+    "off": "Desactivado",
+    "levels": "Niveles",
+    "levelsTitle": "Listar {n} niveles de encabezados",
+    "numbering": "Numeración de encabezados",
+    "numberingNone": "Ninguna",
+    "numberingCustom": "Personalizada…",
+    "numberingInvalid": "Usa 1, I, i, A o a para cada nivel, separados por comas",
+    "numberingPreview": "Vista previa: {preview}"
   },
   "dropzone": {
     "drop": "Suelta para abrir"

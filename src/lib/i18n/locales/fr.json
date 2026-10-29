@@ -312,7 +312,18 @@
     "pageSizeA4": "A4",
     "templatesHint": "Vos modèles se trouvent dans le dossier des modèles, un dossier par modèle avec template.css et template.json. Dupliquez un modèle pour partir de celui-ci ; les modifications s'affichent dès que vous enregistrez le fichier.",
     "highlightChanges": "Surligner les modifications",
-    "highlightChangesHint": "Quand un fichier ouvert change sur le disque, les paragraphes modifiés sont marqués jusqu'à ce que vous les effaciez depuis la barre d'état."
+    "highlightChangesHint": "Quand un fichier ouvert change sur le disque, les paragraphes modifiés sont marqués jusqu'à ce que vous les effaciez depuis la barre d'état.",
+    "contents": "Sommaire et numérotation",
+    "tocDefault": "Ajouter un sommaire",
+    "tocDefaultHint": "Pour les documents qui n'en décident pas. Une ligne {code} le place à un endroit précis.",
+    "tocDepth": "Niveaux listés",
+    "tocDepthHint": "Nombre de niveaux de titres listés dans le sommaire, sous le titre. Un document peut définir {code}.",
+    "headingNumbering": "Numérotation des titres",
+    "headingNumberingHint": "Numérote les titres sous le titre du document. Un document peut définir {code}.",
+    "numberingFormat": "Format personnalisé",
+    "numberingFormatHint": "Un modèle par niveau, séparés par des virgules, comme 1, 1.1 ou I, i, a. Un 1, I, i, A ou a représente un numéro.",
+    "tocTitle": "Titre du sommaire",
+    "tocTitleHint": "Laissez vide pour « Sommaire ». Un document peut définir {code}."
   },
   "templates": {
     "none": "Aucun (vue lecture)",
@@ -344,6 +355,24 @@
   "sections": {
     "collapse": "Replier la section",
     "expand": "Déplier la section"
+  },
+  "contents": {
+    "title": "Sommaire",
+    "menuTitle": "Sommaire et numérotation",
+    "menuTitleNoFile": "Ouvrez un fichier pour ajouter un sommaire ou une numérotation",
+    "toc": "Sommaire",
+    "followDocument": "Suivre le document",
+    "show": "Afficher",
+    "hide": "Masquer",
+    "on": "Activé",
+    "off": "Désactivé",
+    "levels": "Niveaux",
+    "levelsTitle": "Lister {n} niveaux de titres",
+    "numbering": "Numérotation des titres",
+    "numberingNone": "Aucune",
+    "numberingCustom": "Personnalisée…",
+    "numberingInvalid": "Utilisez 1, I, i, A ou a pour chaque niveau, séparés par des virgules",
+    "numberingPreview": "Aperçu : {preview}"
   },
   "dropzone": {
     "drop": "Déposez pour ouvrir"
