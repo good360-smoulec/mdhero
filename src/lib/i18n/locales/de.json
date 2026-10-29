@@ -312,7 +312,18 @@
     "pageSizeA4": "A4",
     "templatesHint": "Eigene Vorlagen liegen im Vorlagenordner, je ein Ordner mit template.css und template.json. Duplizieren Sie eine Vorlage, um darauf aufzubauen; Änderungen erscheinen, sobald Sie die Datei speichern.",
     "highlightChanges": "Änderungen hervorheben",
-    "highlightChangesHint": "Wenn sich eine geöffnete Datei auf dem Datenträger ändert, werden die geänderten Absätze markiert, bis du die Markierung in der Statusleiste entfernst."
+    "highlightChangesHint": "Wenn sich eine geöffnete Datei auf dem Datenträger ändert, werden die geänderten Absätze markiert, bis du die Markierung in der Statusleiste entfernst.",
+    "contents": "Inhaltsverzeichnis und Nummerierung",
+    "tocDefault": "Inhaltsverzeichnis hinzufügen",
+    "tocDefaultHint": "Für Dokumente, die nichts festlegen. Eine Zeile {code} setzt es an eine bestimmte Stelle.",
+    "tocDepth": "Aufgelistete Ebenen",
+    "tocDepthHint": "Wie viele Überschriftenebenen das Verzeichnis unter dem Titel auflistet. Ein Dokument kann {code} setzen.",
+    "headingNumbering": "Überschriften nummerieren",
+    "headingNumberingHint": "Nummeriert die Überschriften unter dem Dokumenttitel. Ein Dokument kann {code} setzen.",
+    "numberingFormat": "Eigenes Format",
+    "numberingFormatHint": "Ein Muster pro Ebene, durch Kommas getrennt, etwa 1, 1.1 oder I, i, a. Eine 1, I, i, A oder a steht für eine Nummer.",
+    "tocTitle": "Titel des Inhaltsverzeichnisses",
+    "tocTitleHint": "Leer lassen für „Inhalt“. Ein Dokument kann {code} setzen."
   },
   "templates": {
     "none": "Keine (Leseansicht)",
@@ -344,6 +355,24 @@
   "sections": {
     "collapse": "Abschnitt einklappen",
     "expand": "Abschnitt ausklappen"
+  },
+  "contents": {
+    "title": "Inhalt",
+    "menuTitle": "Inhaltsverzeichnis und Nummerierung",
+    "menuTitleNoFile": "Öffnen Sie eine Datei, um ein Inhaltsverzeichnis oder eine Nummerierung hinzuzufügen",
+    "toc": "Inhaltsverzeichnis",
+    "followDocument": "Dem Dokument folgen",
+    "show": "Anzeigen",
+    "hide": "Ausblenden",
+    "on": "An",
+    "off": "Aus",
+    "levels": "Ebenen",
+    "levelsTitle": "{n} Überschriftenebenen auflisten",
+    "numbering": "Überschriften nummerieren",
+    "numberingNone": "Keine",
+    "numberingCustom": "Eigene…",
+    "numberingInvalid": "Verwenden Sie 1, I, i, A oder a für jede Ebene, durch Kommas getrennt",
+    "numberingPreview": "Vorschau: {preview}"
   },
   "dropzone": {
     "drop": "Zum Öffnen ablegen"

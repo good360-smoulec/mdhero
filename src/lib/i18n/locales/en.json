@@ -312,7 +312,18 @@
     "pageSizeA4": "A4",
     "templatesHint": "Your own templates live in the templates folder, one folder each holding template.css and template.json. Duplicate a template to start from it; changes show up as soon as you save the file.",
     "highlightChanges": "Highlight what changed",
-    "highlightChangesHint": "When an open file changes on disk, mark the paragraphs that changed until you clear them from the status bar."
+    "highlightChangesHint": "When an open file changes on disk, mark the paragraphs that changed until you clear them from the status bar.",
+    "contents": "Table of contents and numbering",
+    "tocDefault": "Add a table of contents",
+    "tocDefaultHint": "For documents that don't choose. A {code} line puts it in a particular place.",
+    "tocDepth": "Levels listed",
+    "tocDepthHint": "How many heading levels the table lists, under the title. A document can set {code}.",
+    "headingNumbering": "Heading numbering",
+    "headingNumberingHint": "Numbers the headings under the document's title. A document can set {code}.",
+    "numberingFormat": "Custom format",
+    "numberingFormatHint": "One pattern per level, separated by commas, like 1, 1.1 or I, i, a. A 1, I, i, A or a stands for a number.",
+    "tocTitle": "Table of contents title",
+    "tocTitleHint": "Leave empty for “Contents”. A document can set {code}."
   },
   "templates": {
     "none": "None (reader view)",
@@ -344,6 +355,24 @@
   "sections": {
     "collapse": "Collapse section",
     "expand": "Expand section"
+  },
+  "contents": {
+    "title": "Contents",
+    "menuTitle": "Table of contents and numbering",
+    "menuTitleNoFile": "Open a file to add a table of contents or numbering",
+    "toc": "Table of contents",
+    "followDocument": "Follow document",
+    "show": "Show",
+    "hide": "Hide",
+    "on": "On",
+    "off": "Off",
+    "levels": "Levels",
+    "levelsTitle": "List {n} heading levels",
+    "numbering": "Heading numbering",
+    "numberingNone": "None",
+    "numberingCustom": "Custom…",
+    "numberingInvalid": "Use 1, I, i, A or a for each level, separated by commas",
+    "numberingPreview": "Preview: {preview}"
   },
   "dropzone": {
     "drop": "Drop to open"
