@@ -141,6 +141,13 @@ describe("the Quick Look path reuses the app's renderer", () => {
     ).toEqual([]);
   });
 
+  it("keeps a failed diagram from leaving Mermaid's error panel in the page", () => {
+    // Without it every failed render appends a "Syntax error" SVG to <body>
+    // that nothing removes, one more on each reload.
+    expect(mermaidSecurityOptions(component)).toContain("suppressErrorRendering=true");
+    expect(mermaidSecurityOptions(preview)).toContain("suppressErrorRendering=true");
+  });
+
   it("keeps Mermaid labels as SVG text in the preview", () => {
     // Specifically guards the DOMPurify 3.4 interaction; all three spellings
     // are needed because Mermaid reads them per-diagram-type.

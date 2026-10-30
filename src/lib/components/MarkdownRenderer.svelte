@@ -101,6 +101,10 @@
       // JS/URL bindings from untrusted diagram source; the SVG is then sanitized
       // again below as defense in depth. (Felipe Boralli disclosure, 2026-08-14.)
       securityLevel: "strict",
+      // A diagram that fails stays as its source. Without this Mermaid adds a
+      // "Syntax error" panel to the end of <body> on every failed render, and
+      // never removes it, so they pile up with each reload.
+      suppressErrorRendering: true,
       // #security: render labels as SVG <text>, never as HTML inside
       // <foreignObject>. DOMPurify >= 3.4 strips HTML from foreignObject (it is
       // a known XSS vector -- the same class the Mermaid disclosure was about),

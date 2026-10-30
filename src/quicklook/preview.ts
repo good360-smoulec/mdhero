@@ -28,6 +28,9 @@ function initMermaid(isDark: boolean): void {
     // JS/URL bindings from untrusted diagram source. Do not relax this; see
     // CLAUDE.md's security invariants.
     securityLevel: "strict",
+    // A diagram that fails stays as its source, without Mermaid's "Syntax
+    // error" panel added to the end of <body>.
+    suppressErrorRendering: true,
     // #security: render labels as SVG <text>, never as HTML inside
     // <foreignObject>. DOMPurify >= 3.4 strips HTML from foreignObject (it is
     // a known XSS vector — the same class the Mermaid disclosure was about),
