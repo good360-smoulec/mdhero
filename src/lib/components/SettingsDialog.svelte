@@ -11,6 +11,7 @@
   import AILookupSettings from "./AILookupSettings.svelte";
   import TemplateSettings from "./TemplateSettings.svelte";
   import { NUMBERING_PRESETS, MAX_TOC_DEPTH, formatNumber, parseNumbering } from "$lib/utils/contents";
+  import { PAGINATION_RULES, presetRules, rulesPreset, type PaginationRule, type PaginationPreset } from "$lib/utils/pagination";
 
   let { visible = $bindable(false) }: { visible: boolean } = $props();
 
@@ -125,6 +126,31 @@
     counters.push([...counters[counters.length - 1].slice(0, -1), 2]);
     return counters.map((c) => formatNumber(parsed, c)).filter(Boolean).join(" · ");
   });
+
+  const RULE_LABELS: Record<PaginationRule, { label: MessageKey; hint: MessageKey }> = {
+    keepHeadings: { label: "settings.ruleKeepHeadings", hint: "settings.ruleKeepHeadingsHint" },
+    widowsOrphans: { label: "settings.ruleWidowsOrphans", hint: "settings.ruleWidowsOrphansHint" },
+    trimPageTop: { label: "settings.ruleTrimPageTop", hint: "settings.ruleTrimPageTopHint" },
+    tableRows: { label: "settings.ruleTableRows", hint: "settings.ruleTableRowsHint" },
+    tableHeaders: { label: "settings.ruleTableHeaders", hint: "settings.ruleTableHeadersHint" },
+    shortBlocks: { label: "settings.ruleShortBlocks", hint: "settings.ruleShortBlocksHint" },
+    listItems: { label: "settings.ruleListItems", hint: "settings.ruleListItemsHint" },
+  };
+  const PRESET_HINTS: Record<PaginationPreset, MessageKey> = {
+    smart: "settings.paginationSmartHint",
+    raw: "settings.paginationRawHint",
+    custom: "settings.paginationCustomHint",
+  };
+  let paginationPreset = $derived(rulesPreset($settings.paginationRules));
+
+  function choosePaginationPreset(value: string) {
+    if (value !== "smart" && value !== "raw") return;
+    settings.update((s) => ({ ...s, paginationRules: presetRules(value) }));
+  }
+
+  function setPaginationRule(rule: PaginationRule, on: boolean) {
+    settings.update((s) => ({ ...s, paginationRules: { ...s.paginationRules, [rule]: on } }));
+  }
 
   function chooseNumbering(value: string) {
     customNumbering = value === CUSTOM_NUMBERING;
@@ -449,6 +475,42 @@
                   />
                 </label>
               </section>
+
+              <section class="settings-section">
+                <h3 class="section-title">{$t('settings.pagination')}</h3>
+                <p class="section-hint">{$t('settings.paginationHint')}</p>
+
+                <label class="setting-row">
+                  <div class="setting-text">
+                    <span class="setting-label">{$t('settings.paginationPreset')}</span>
+                    <span class="setting-hint">{$t(PRESET_HINTS[paginationPreset])}</span>
+                  </div>
+                  <select
+                    class="setting-select"
+                    value={paginationPreset}
+                    onchange={(e) => choosePaginationPreset(e.currentTarget.value)}
+                  >
+                    <option value="smart">{$t('settings.paginationSmart')}</option>
+                    <option value="raw">{$t('settings.paginationRaw')}</option>
+                    <option value="custom" disabled={paginationPreset !== "custom"}>{$t('settings.paginationCustom')}</option>
+                  </select>
+                </label>
+
+                {#each PAGINATION_RULES as rule (rule)}
+                  <label class="setting-row rule-row">
+                    <div class="setting-text">
+                      <span class="setting-label">{$t(RULE_LABELS[rule].label)}</span>
+                      <span class="setting-hint">{$t(RULE_LABELS[rule].hint)}</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={$settings.paginationRules[rule]}
+                      onchange={(e) => setPaginationRule(rule, e.currentTarget.checked)}
+                      class="setting-switch"
+                    />
+                  </label>
+                {/each}
+              </section>
             </div>
           {/if}
           {#if tab === "editor"}
@@ -674,6 +736,19 @@
 
   .settings-section {
     padding-top: 12px;
+  }
+
+  .settings-section + .settings-section {
+    border-top: 1px solid #f2f2f7;
+    margin-top: 16px;
+  }
+
+  :global(html.dark) .settings-section + .settings-section {
+    border-top-color: #3a3a3c;
+  }
+
+  .setting-row.rule-row {
+    padding-left: 12px;
   }
 
   .section-title {
