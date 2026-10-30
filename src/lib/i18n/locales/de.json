@@ -454,7 +454,8 @@
     "searchGoogle": "Auswahl bei Google suchen",
     "ask": "{name} fragen",
     "noPrompts": "Keine Prompts — in den Einstellungen hinzufügen",
-    "customPrompt": "Eigener Prompt..."
+    "customPrompt": "Eigener Prompt...",
+    "define": "„{word}“ nachschlagen"
   },
   "languageDialog": {
     "title": "Wählen Sie Ihre Sprache",
@@ -488,5 +489,34 @@
   "files": {
     "openFailed": "Datei konnte nicht geöffnet werden: {err}",
     "untitled": "Unbenannt"
+  },
+  "dictionary": {
+    "loading": "Wird nachgeschlagen…",
+    "notFound": "Keine Definition für „{word}“ gefunden.",
+    "error": "Das Wörterbuch ist nicht erreichbar. Prüfe deine Verbindung.",
+    "retry": "Erneut versuchen",
+    "more": {
+      "one": "{count} weitere Bedeutung",
+      "other": "{count} weitere Bedeutungen"
+    },
+    "less": "Weniger anzeigen",
+    "source": "Wiktionary",
+    "sourceTitle": "Definitionen aus Wiktionary (CC BY-SA 4.0). Vollständigen Eintrag öffnen.",
+    "pos": {
+      "noun": "Substantiv",
+      "verb": "Verb",
+      "adj": "Adjektiv",
+      "adv": "Adverb",
+      "name": "Eigenname",
+      "pron": "Pronomen",
+      "prep": "Präposition",
+      "conj": "Konjunktion",
+      "intj": "Interjektion",
+      "num": "Numerale",
+      "det": "Determinativ",
+      "article": "Artikel",
+      "phrase": "Wendung",
+      "abbrev": "Abkürzung"
+    }
   }
 }

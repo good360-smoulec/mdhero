@@ -15,6 +15,8 @@
   import { chromeTop } from "$lib/utils/layout";
   import { tocEntries, activeHeadingId, extractToc, isObserverPaused } from "$lib/stores/toc";
   import { aiLookup, setPendingSelection } from "$lib/stores/aiLookup";
+  import { setPendingLookup } from "$lib/stores/dictionary";
+  import { lookupText, wordAround } from "$lib/utils/dictionary";
   import { t, translate } from "$lib/i18n";
   import mermaid from "mermaid";
   import DOMPurify from "dompurify";
@@ -185,10 +187,20 @@
   // rebuilt as the first items of our menu) and pass a slim provider payload
   // to Rust (no urlTemplate, no prompt template body — those stay
   // frontend-side; Rust only needs id/name to build the menu).
+  function wordAtPoint(x: number, y: number): string | null {
+    const range = document.caretRangeFromPoint?.(x, y);
+    const node = range?.startContainer;
+    if (!node || node.nodeType !== Node.TEXT_NODE || node.parentElement?.closest(".section-toggle")) return null;
+    return wordAround(node.textContent ?? "", range.startOffset, document.documentElement.lang || undefined);
+  }
+
   function handleContextMenu(e: MouseEvent) {
     e.preventDefault();
     const selection = window.getSelection()?.toString() ?? "";
     setPendingSelection(selection);
+
+    const word = selection.trim() ? lookupText(selection) : wordAtPoint(e.clientX, e.clientY);
+    setPendingLookup(word ? { word, x: e.clientX, y: e.clientY } : null);
 
     const providers = get(aiLookup).providers.map((p) => ({
       id: p.id,
@@ -210,6 +222,7 @@
         cut: translate("menu.cut"),
         copy: translate("menu.copy"),
         paste: translate("menu.paste"),
+        define: word ? translate("contextMenu.define", { word }) : null,
       },
     }).catch((err) => console.error("show_ai_context_menu failed:", err));
   }

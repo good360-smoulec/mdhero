@@ -454,7 +454,8 @@
     "searchGoogle": "Search Google for selection",
     "ask": "Ask {name}",
     "noPrompts": "No prompts — add some in Settings",
-    "customPrompt": "Custom prompt..."
+    "customPrompt": "Custom prompt...",
+    "define": "Define “{word}”"
   },
   "languageDialog": {
     "title": "Choose your language",
@@ -488,5 +489,34 @@
   "files": {
     "openFailed": "Failed to open file: {err}",
     "untitled": "Untitled"
+  },
+  "dictionary": {
+    "loading": "Looking up…",
+    "notFound": "No definition found for “{word}”.",
+    "error": "Couldn't reach the dictionary. Check your connection.",
+    "retry": "Try again",
+    "more": {
+      "one": "{count} more meaning",
+      "other": "{count} more meanings"
+    },
+    "less": "Show less",
+    "source": "Wiktionary",
+    "sourceTitle": "Definitions from Wiktionary (CC BY-SA 4.0). Open the full entry.",
+    "pos": {
+      "noun": "noun",
+      "verb": "verb",
+      "adj": "adjective",
+      "adv": "adverb",
+      "name": "proper noun",
+      "pron": "pronoun",
+      "prep": "preposition",
+      "conj": "conjunction",
+      "intj": "interjection",
+      "num": "numeral",
+      "det": "determiner",
+      "article": "article",
+      "phrase": "phrase",
+      "abbrev": "abbreviation"
+    }
   }
 }
