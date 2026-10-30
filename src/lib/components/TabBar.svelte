@@ -277,11 +277,13 @@
     <!-- File tabs -->
     <div class="tabbar-files">
       {#each $tabs as tab, idx (tab.id)}
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
+          role="button"
+          tabindex="0"
           onmousedown={(e) => handleMouseDown(e, idx)}
           onauxclick={(e) => handleAuxClick(e, tab.id)}
           onclick={() => tabStore.switchTab(tab.id)}
+          onkeydown={(e) => e.key === 'Enter' && e.target === e.currentTarget && tabStore.switchTab(tab.id)}
           oncontextmenu={(e) => handleContextMenu(e, tab)}
           class="tab"
           class:active={$activeTabId === tab.id}

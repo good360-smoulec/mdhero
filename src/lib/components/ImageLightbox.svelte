@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { t } from "$lib/i18n";
+
   let { visible = $bindable(false), src = "", images = [] as string[], index = $bindable(0) }: {
     visible: boolean;
     src: string;
@@ -45,17 +47,18 @@
 </script>
 
 {#if visible}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <!-- Escape and the arrow keys are handled on the document, above. -->
+  <!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events -->
   <div class="lightbox" onclick={handleBackdrop}>
-    <button class="lb-close" onclick={close}>
+    <button class="lb-close" onclick={close} aria-label={$t("common.close")}>
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="4" x2="16" y2="16"/><line x1="16" y1="4" x2="4" y2="16"/></svg>
     </button>
 
     {#if images.length > 1}
-      <button class="lb-nav lb-prev" onclick={prev}>
+      <button class="lb-nav lb-prev" onclick={prev} aria-label={$t("lightbox.prevAria")}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="13,4 7,10 13,16"/></svg>
       </button>
-      <button class="lb-nav lb-next" onclick={next}>
+      <button class="lb-nav lb-next" onclick={next} aria-label={$t("lightbox.nextAria")}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="7,4 13,10 7,16"/></svg>
       </button>
       <div class="lb-counter">{index + 1} / {images.length}</div>

@@ -182,7 +182,7 @@
       <!-- Header -->
       <div class="dialog-header">
         <h2 class="dialog-title">{$t('openDialog.title')}</h2>
-        <button onclick={() => (visible = false)} class="dialog-close">
+        <button onclick={() => (visible = false)} class="dialog-close" aria-label={$t('common.close')}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="3" x2="11" y2="11"/><line x1="11" y1="3" x2="3" y2="11"/></svg>
         </button>
       </div>

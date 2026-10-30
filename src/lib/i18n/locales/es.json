@@ -544,5 +544,9 @@
       "phrase": "locución",
       "abbrev": "abreviatura"
     }
+  },
+  "lightbox": {
+    "prevAria": "Imagen anterior",
+    "nextAria": "Imagen siguiente"
   }
 }

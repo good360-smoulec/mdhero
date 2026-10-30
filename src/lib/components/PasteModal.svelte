@@ -170,7 +170,7 @@
               <span>{$t('pasteModal.llmMode')}</span>
             </label>
           {/if}
-          <button onclick={() => (visible = false)} class="modal-close">
+          <button onclick={() => (visible = false)} class="modal-close" aria-label={$t('common.close')}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="3" x2="11" y2="11"/><line x1="11" y1="3" x2="3" y2="11"/></svg>
           </button>
         </div>
@@ -285,17 +285,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-
-  .modal-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1c1c1e;
-    margin: 0;
-  }
-
-  :global(html.dark) .modal-title {
-    color: #e5e5e7;
   }
 
   .llm-badge {

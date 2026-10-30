@@ -544,5 +544,9 @@
       "phrase": "Wendung",
       "abbrev": "Abkürzung"
     }
+  },
+  "lightbox": {
+    "prevAria": "Vorheriges Bild",
+    "nextAria": "Nächstes Bild"
   }
 }
