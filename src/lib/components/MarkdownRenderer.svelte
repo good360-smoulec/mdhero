@@ -10,6 +10,8 @@
   import { markedChangeCount } from "$lib/stores/docChanges";
   import { addSectionToggles, applySections, sectionItems, stripSections } from "$lib/utils/sections";
   import { applyContents, contentsKey, type ContentsOptions } from "$lib/utils/contents";
+  import { paginationCss, rulesKey } from "$lib/utils/pagination";
+  import { registerPageBreakRules, setPageBreakRules } from "$lib/templates/paged-rules";
   import { revealElement, sectionsActive, setSectionsView } from "$lib/stores/sections";
   import { pagesLaidOut } from "$lib/stores/search";
   import { chromeTop } from "$lib/utils/layout";
@@ -76,6 +78,7 @@
   let pagedFailed = $state(false);
   let showPages = $derived(!!template && paged && !pagedFailed);
   let contentsSignature = $derived(contentsKey(contents));
+  let paginationSignature = $derived(rulesKey($settings.paginationRules));
   let pagedRun = 0;
   let previewer: Previewer | null = null;
   let lastMermaidTheme = "";
@@ -268,6 +271,7 @@
     const pages = showPages;
     // Pages leave hidden sections out of the layout, so collapsing lays them out again.
     if (pages) collapsed;
+    if (pages) paginationSignature;
 
     // A re-render (e.g. opening a linked file in a new tab) replaces the
     // article, so a hover's mouseleave may never fire — clear any stuck tooltip.
@@ -507,9 +511,13 @@
     document.body.appendChild(stage);
     let next: Previewer | null = null;
     try {
-      const { Previewer } = await import("pagedjs");
-      next = new Previewer();
-      await next.preview(content, [{ "template.css": pagedStylesheet(tpl, pageSize) }], stage);
+      const paged = await import("pagedjs");
+      registerPageBreakRules(paged);
+      const rules = get(settings).paginationRules;
+      setPageBreakRules(rules);
+      next = new paged.Previewer();
+      const css = [pagedStylesheet(tpl, pageSize), paginationCss(rules)].join("\n");
+      await next.preview(content, [{ "template.css": css }], stage);
     } catch (err) {
       console.error("Paged view failed, showing the single sheet:", err);
       next?.polisher.destroy();

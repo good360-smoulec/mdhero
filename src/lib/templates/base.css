@@ -181,18 +181,21 @@
     zoom: 1 !important;
   }
 
-  .doc-page h1,
-  .doc-page h2,
-  .doc-page h3,
-  .doc-page h4 {
+  /* For the browser's own printing of the single sheet, if page view fails.
+     Pages laid out by Paged.js (.doc-flow) follow the page-break rules in
+     Settings instead (utils/pagination.ts). */
+  .doc-page:not(.doc-flow) h1,
+  .doc-page:not(.doc-flow) h2,
+  .doc-page:not(.doc-flow) h3,
+  .doc-page:not(.doc-flow) h4 {
     break-after: avoid;
   }
 
-  .doc-page pre,
-  .doc-page table,
-  .doc-page img,
-  .doc-page .mermaid-diagram,
-  .doc-page .markdown-alert {
+  .doc-page:not(.doc-flow) pre,
+  .doc-page:not(.doc-flow) table,
+  .doc-page:not(.doc-flow) img,
+  .doc-page:not(.doc-flow) .mermaid-diagram,
+  .doc-page:not(.doc-flow) .markdown-alert {
     break-inside: avoid;
   }
 

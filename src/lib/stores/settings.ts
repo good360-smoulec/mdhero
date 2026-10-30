@@ -2,6 +2,7 @@ import { writable } from "svelte/store";
 import type { PageSize } from "$lib/templates";
 import { DEFAULT_ACCENT, normalizeAccent } from "../utils/accent";
 import { clampTocDepth, DEFAULT_TOC_DEPTH } from "../utils/contents";
+import { normalizeRules, presetRules, type PaginationRules } from "../utils/pagination";
 
 export interface ReaderSettings {
   fontSize: number;
@@ -48,6 +49,8 @@ export interface ReaderSettings {
   headingNumbering: string;
   /** Title above the table of contents; "" uses the translated "Contents". */
   tocTitle: string;
+  /** Which page-break rules page view and PDFs follow (utils/pagination.ts). */
+  paginationRules: PaginationRules;
 }
 
 const STORAGE_KEY = "mdhero-settings";
@@ -129,6 +132,7 @@ function loadSettings(): ReaderSettings {
     tocDepth: DEFAULT_TOC_DEPTH,
     headingNumbering: "",
     tocTitle: "",
+    paginationRules: presetRules("smart"),
   };
 
   if (typeof localStorage === "undefined") return defaults;
@@ -162,6 +166,7 @@ function loadSettings(): ReaderSettings {
         tocDepth: clampTocDepth(parsed.tocDepth),
         headingNumbering: typeof parsed.headingNumbering === "string" ? parsed.headingNumbering : defaults.headingNumbering,
         tocTitle: typeof parsed.tocTitle === "string" ? parsed.tocTitle : defaults.tocTitle,
+        paginationRules: normalizeRules(parsed.paginationRules),
       };
     }
   } catch {}

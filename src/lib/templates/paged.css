@@ -32,6 +32,12 @@
   text-align-last: auto !important;
 }
 
+/* Pictures can't continue on the next page, whatever the page-break rules. */
+.doc-page.doc-flow img,
+.doc-page.doc-flow .mermaid-diagram {
+  break-inside: avoid;
+}
+
 /* Each table of contents entry ends in its page number, after a dotted leader. */
 .doc-page.doc-flow .doc-toc-leader {
   display: block;
