@@ -323,7 +323,10 @@
     "numberingFormat": "Formato personalizado",
     "numberingFormatHint": "Un patrón por nivel, separados por comas, como 1, 1.1 o I, i, a. Un 1, I, i, A o a representa un número.",
     "tocTitle": "Título del índice",
-    "tocTitleHint": "Déjalo vacío para «Contenido». Un documento puede definir {code}."
+    "tocTitleHint": "Déjalo vacío para «Contenido». Un documento puede definir {code}.",
+    "tabGeneral": "General",
+    "tabTemplates": "Plantillas",
+    "tabLayout": "Diseño"
   },
   "templates": {
     "none": "Ninguna (vista de lectura)",

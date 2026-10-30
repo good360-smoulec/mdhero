@@ -323,7 +323,10 @@
     "numberingFormat": "Custom format",
     "numberingFormatHint": "One pattern per level, separated by commas, like 1, 1.1 or I, i, a. A 1, I, i, A or a stands for a number.",
     "tocTitle": "Table of contents title",
-    "tocTitleHint": "Leave empty for “Contents”. A document can set {code}."
+    "tocTitleHint": "Leave empty for “Contents”. A document can set {code}.",
+    "tabGeneral": "General",
+    "tabTemplates": "Templates",
+    "tabLayout": "Layout"
   },
   "templates": {
     "none": "None (reader view)",

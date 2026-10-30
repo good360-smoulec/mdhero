@@ -315,7 +315,10 @@
     "numberingFormat": "自定义格式",
     "numberingFormatHint": "每级一个模式，用逗号分隔，如 1, 1.1 或 I, i, a。1、I、i、A 或 a 代表编号。",
     "tocTitle": "目录标题",
-    "tocTitleHint": "留空则为“目录”。文档可设置 {code}。"
+    "tocTitleHint": "留空则为“目录”。文档可设置 {code}。",
+    "tabGeneral": "常规",
+    "tabTemplates": "模板",
+    "tabLayout": "版式"
   },
   "templates": {
     "none": "无（阅读视图）",
