@@ -323,7 +323,10 @@
     "numberingFormat": "Format personnalisé",
     "numberingFormatHint": "Un modèle par niveau, séparés par des virgules, comme 1, 1.1 ou I, i, a. Un 1, I, i, A ou a représente un numéro.",
     "tocTitle": "Titre du sommaire",
-    "tocTitleHint": "Laissez vide pour « Sommaire ». Un document peut définir {code}."
+    "tocTitleHint": "Laissez vide pour « Sommaire ». Un document peut définir {code}.",
+    "tabGeneral": "Général",
+    "tabTemplates": "Modèles",
+    "tabLayout": "Mise en page"
   },
   "templates": {
     "none": "Aucun (vue lecture)",

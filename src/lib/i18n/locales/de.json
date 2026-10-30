@@ -323,7 +323,10 @@
     "numberingFormat": "Eigenes Format",
     "numberingFormatHint": "Ein Muster pro Ebene, durch Kommas getrennt, etwa 1, 1.1 oder I, i, a. Eine 1, I, i, A oder a steht für eine Nummer.",
     "tocTitle": "Titel des Inhaltsverzeichnisses",
-    "tocTitleHint": "Leer lassen für „Inhalt“. Ein Dokument kann {code} setzen."
+    "tocTitleHint": "Leer lassen für „Inhalt“. Ein Dokument kann {code} setzen.",
+    "tabGeneral": "Allgemein",
+    "tabTemplates": "Vorlagen",
+    "tabLayout": "Layout"
   },
   "templates": {
     "none": "Keine (Leseansicht)",
