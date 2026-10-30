@@ -471,6 +471,9 @@ pub struct ContextMenuLabels {
     pub cut: String,
     pub copy: String,
     pub paste: String,
+    /// "Define “word”" for the word that was right-clicked; absent when there
+    /// is no word to look up.
+    pub define: Option<String>,
 }
 
 #[tauri::command]
@@ -510,6 +513,13 @@ pub fn show_ai_context_menu(
     )
     .map_err(|e| e.to_string())?;
     menu.append(&google_item).map_err(|e| e.to_string())?;
+
+    // The word itself stays in the webview, like the selection.
+    if let Some(define) = &labels.define {
+        let define_item = MenuItem::with_id(&app, "aimenu:define", define, true, None::<&str>)
+            .map_err(|e| e.to_string())?;
+        menu.append(&define_item).map_err(|e| e.to_string())?;
+    }
 
     if !providers.is_empty() {
         menu.append(&PredefinedMenuItem::separator(&app).map_err(|e| e.to_string())?)

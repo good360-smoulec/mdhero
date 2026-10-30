@@ -416,7 +416,8 @@
     "searchGoogle": "用 Google 搜索选中内容",
     "ask": "询问 {name}",
     "noPrompts": "没有提示词 — 请在设置中添加",
-    "customPrompt": "自定义提示词..."
+    "customPrompt": "自定义提示词...",
+    "define": "查词“{word}”"
   },
   "languageDialog": {
     "title": "选择界面语言",
@@ -450,5 +451,33 @@
   "files": {
     "openFailed": "无法打开文件：{err}",
     "untitled": "未命名"
+  },
+  "dictionary": {
+    "loading": "正在查询…",
+    "notFound": "未找到“{word}”的释义。",
+    "error": "无法连接词典，请检查网络连接。",
+    "retry": "重试",
+    "more": {
+      "other": "另外 {count} 个释义"
+    },
+    "less": "收起",
+    "source": "维基词典",
+    "sourceTitle": "释义来自维基词典（CC BY-SA 4.0）。打开完整词条。",
+    "pos": {
+      "noun": "名词",
+      "verb": "动词",
+      "adj": "形容词",
+      "adv": "副词",
+      "name": "专有名词",
+      "pron": "代词",
+      "prep": "介词",
+      "conj": "连词",
+      "intj": "叹词",
+      "num": "数词",
+      "det": "限定词",
+      "article": "冠词",
+      "phrase": "短语",
+      "abbrev": "缩写"
+    }
   }
 }

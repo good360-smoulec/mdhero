@@ -45,6 +45,8 @@
   import AboutDialog from "$lib/components/AboutDialog.svelte";
   import CustomPromptModal from "$lib/components/CustomPromptModal.svelte";
   import { assembleUrlByIds, consumePendingSelection } from "$lib/stores/aiLookup";
+  import { dictionaryLookup, openPendingLookup, setPendingLookup } from "$lib/stores/dictionary";
+  import DictionaryPopup from "$lib/components/DictionaryPopup.svelte";
   import FrontmatterBar from "$lib/components/FrontmatterBar.svelte";
   import StatusBar from "$lib/components/StatusBar.svelte";
   import ProgressBar from "$lib/components/ProgressBar.svelte";
@@ -106,7 +108,8 @@
   // ESC handler. Each modal's own ESC handler also calls stopPropagation(); the
   // two together cover both focus-inside and focus-outside-modal cases.
   let anyModalVisible = $derived(
-    searchVisible || pasteVisible || openVisible || settingsVisible || aboutVisible || customPromptVisible || lightboxVisible || languageVisible
+    searchVisible || pasteVisible || openVisible || settingsVisible || aboutVisible || customPromptVisible || lightboxVisible || languageVisible ||
+      $dictionaryLookup !== null
   );
 
   // Reading progress: debounced scroll save + restore guard
@@ -747,6 +750,11 @@
     // a future menu open.
     (window as any).__mdhero_ai_lookup = async (menuId: string) => {
       const selection = consumePendingSelection();
+      if (menuId === "aimenu:define") {
+        openPendingLookup();
+        return;
+      }
+      setPendingLookup(null);
       if (menuId === "aimenu:google") {
         if (!selection.trim()) return;
         const url = `https://www.google.com/search?q=${encodeURIComponent(selection)}`;
@@ -1299,6 +1307,7 @@
   <LanguageDialog bind:visible={languageVisible} />
   <AboutDialog bind:visible={aboutVisible} />
   <CustomPromptModal bind:visible={customPromptVisible} selection={customPromptSelection} />
+  <DictionaryPopup />
 
   <div class="doc-area">
   {#if !rendererReady}
